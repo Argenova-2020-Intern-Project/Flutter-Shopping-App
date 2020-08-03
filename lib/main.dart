@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -67,7 +66,6 @@ class _SignInPage extends State<SignInPage> {
         password: _password.text,
       ))
           .user;
-
       if (user != null) {
         setState(() {
           _success = true;
@@ -100,14 +98,6 @@ class _SignInPage extends State<SignInPage> {
               _validatePassword = false;
             }
             if (_password.text.isNotEmpty && _email.text.isNotEmpty) {
-              /*
-              _validateEmail = false;
-              _validatePassword = false;
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainMenuPage()),
-              );
-              */
               _signInWithEmailAndPassword();
             }
           });
@@ -196,7 +186,6 @@ class _SignUpPage extends State<SignUpPage> {
   bool _validateEmail = false;
   bool _validatePassword = false;
   bool _termsCond = false;
-  String _userEmail;
   @override
   Widget build(BuildContext context) {
     final nameSurnameField = TextField(
@@ -255,19 +244,12 @@ class _SignUpPage extends State<SignUpPage> {
     );
 
     @override
-    Future<bool> signUpProcess(String email, String password) async {
+    void signUpProcess(String email, String password) async {
       FirebaseUser user = (await _firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user;
       try {
         await user.sendEmailVerification();
-        if (user != null) {
-          setState(() {
-            _userEmail = user.email;
-          });
-        }
-        while (!user.isEmailVerified) print("AA");
-        return user.isEmailVerified;
       } catch (e) {
         print("An error occured while trying to send email verification");
         print(e.message);
@@ -302,23 +284,13 @@ class _SignUpPage extends State<SignUpPage> {
                 _email.text.isNotEmpty &&
                 _name.text.isNotEmpty &&
                 _termsCond) {
-              /*
-              _validateEmail = false;
-              _validatePassword = false;
-              _validateName = false;
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SignInPage()),
-              );
-              */
               signUpProcess(_email.text, _password.text);
-              print("BB");
             }
           });
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => EmailSendRedirecting(_userEmail)));
+                  builder: (context) => EmailSendRedirecting(_email.text)));
         },
         child: Text("Sign-Up",
             textAlign: TextAlign.center,
@@ -402,13 +374,6 @@ class EmailSendRedirecting extends StatelessWidget {
                     '. Please check your E-Mail and verify your account'),
                 SizedBox(height: 50.0),
                 signInButton,
-                /*
-                Text(_success == null
-                    ? ''
-                    : (_success
-                        ? 'Successfully registered ' + _userEmail
-                        : 'Registration failed')),
-                */
               ],
             ),
           ),
