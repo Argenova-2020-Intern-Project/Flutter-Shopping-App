@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
 void main() => runApp(MyApp());
 
@@ -26,19 +31,21 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPage extends State<SignInPage> {
-  final _mail = TextEditingController();
+  final _email = TextEditingController();
   final _password = TextEditingController();
-  bool _validateMail = false;
+  bool _validateEmail = false;
   bool _validatePassword = false;
+  bool _success;
+  String _userEmail;
   Widget build(BuildContext context) {
-    final mailField = TextField(
-      controller: _mail,
+    final emailField = TextField(
+      controller: _email,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         labelText: "E-mail",
-        errorText: _validateMail ? 'E-Mail can\'t be empty!' : null,
+        errorText: _validateEmail ? 'E-Mail can\'t be empty!' : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
     );
@@ -53,6 +60,26 @@ class _SignInPage extends State<SignInPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
     );
+
+    void _signInWithEmailAndPassword() async {
+      final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+        email: _email.text,
+        password: _password.text,
+      ))
+          .user;
+
+      if (user != null) {
+        setState(() {
+          _success = true;
+          _userEmail = user.email;
+        });
+      } else {
+        setState(() {
+          _success = false;
+        });
+      }
+    }
+
     final signInButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -62,23 +89,26 @@ class _SignInPage extends State<SignInPage> {
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           setState(() {
-            if (_mail.text.isEmpty) {
-              _validateMail = true;
+            if (_email.text.isEmpty) {
+              _validateEmail = true;
             } else {
-              _validateMail = false;
+              _validateEmail = false;
             }
             if (_password.text.isEmpty) {
               _validatePassword = true;
             } else {
               _validatePassword = false;
             }
-            if (_password.text.isNotEmpty && _mail.text.isNotEmpty) {
-              _validateMail = false;
+            if (_password.text.isNotEmpty && _email.text.isNotEmpty) {
+              /*
+              _validateEmail = false;
               _validatePassword = false;
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => MainMenuPage()),
               );
+              */
+              _signInWithEmailAndPassword();
             }
           });
         },
@@ -107,7 +137,9 @@ class _SignInPage extends State<SignInPage> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Container(
           color: Colors.white,
@@ -126,7 +158,7 @@ class _SignInPage extends State<SignInPage> {
                       textAlign: TextAlign.center,
                     )),
                 SizedBox(height: 25.0),
-                mailField,
+                emailField,
                 SizedBox(height: 25.0),
                 passwordField,
                 SizedBox(height: 25.0),
@@ -135,6 +167,11 @@ class _SignInPage extends State<SignInPage> {
                 new Text("Don't have an account?"),
                 SizedBox(height: 5.0),
                 signUpButton,
+                Text(_success == null
+                    ? ''
+                    : (_success
+                        ? 'Successfully signed in ' + _userEmail
+                        : 'Sign-In failed')),
               ],
             ),
           ),
@@ -152,13 +189,14 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPage extends State<SignUpPage> {
-  bool _termsCond = false;
   final _name = TextEditingController();
-  final _mail = TextEditingController();
+  final _email = TextEditingController();
   final _password = TextEditingController();
   bool _validateName = false;
-  bool _validateMail = false;
+  bool _validateEmail = false;
   bool _validatePassword = false;
+  bool _termsCond = false;
+  String _userEmail;
   @override
   Widget build(BuildContext context) {
     final nameSurnameField = TextField(
@@ -172,14 +210,14 @@ class _SignUpPage extends State<SignUpPage> {
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
-    final mailField = TextField(
-      controller: _mail,
+    final emailField = TextField(
+      controller: _email,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         labelText: "E-mail",
-        errorText: _validateMail ? 'E-Mail can\'t be empty!' : null,
+        errorText: _validateEmail ? 'E-Mail can\'t be empty!' : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
     );
@@ -200,9 +238,13 @@ class _SignUpPage extends State<SignUpPage> {
         CheckboxListTile(
           controlAffinity: ListTileControlAffinity.leading,
           title: Text("I agree to the terms and conditions",
-          style: TextStyle(fontFamily: 'Montserrat', fontSize: 11.0)),
+              style: TextStyle(fontFamily: 'Montserrat', fontSize: 11.0)),
           value: _termsCond,
-          subtitle: !_termsCond ? Text('(Required)',textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Montserrat', fontSize: 11.0)) : null,
+          subtitle: !_termsCond
+              ? Text('(Required)',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Montserrat', fontSize: 11.0))
+              : null,
           onChanged: (value) {
             setState(() {
               _termsCond = value;
@@ -211,6 +253,27 @@ class _SignUpPage extends State<SignUpPage> {
         )
       ],
     );
+
+    @override
+    Future<bool> signUpProcess(String email, String password) async {
+      FirebaseUser user = (await _firebaseAuth.createUserWithEmailAndPassword(
+              email: email, password: password))
+          .user;
+      try {
+        await user.sendEmailVerification();
+        if (user != null) {
+          setState(() {
+            _userEmail = user.email;
+          });
+        }
+        while (!user.isEmailVerified) print("AA");
+        return user.isEmailVerified;
+      } catch (e) {
+        print("An error occured while trying to send email verification");
+        print(e.message);
+      }
+    }
+
     final signUpButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -218,12 +281,12 @@ class _SignUpPage extends State<SignUpPage> {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {
+        onPressed: () async {
           setState(() {
-            if (_mail.text.isEmpty) {
-              _validateMail = true;
+            if (_email.text.isEmpty) {
+              _validateEmail = true;
             } else {
-              _validateMail = false;
+              _validateEmail = false;
             }
             if (_password.text.isEmpty) {
               _validatePassword = true;
@@ -236,17 +299,26 @@ class _SignUpPage extends State<SignUpPage> {
               _validateName = false;
             }
             if (_password.text.isNotEmpty &&
-                _mail.text.isNotEmpty &&
-                _name.text.isNotEmpty && _termsCond) {
-              _validateMail = false;
+                _email.text.isNotEmpty &&
+                _name.text.isNotEmpty &&
+                _termsCond) {
+              /*
+              _validateEmail = false;
               _validatePassword = false;
               _validateName = false;
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SignInPage()),
               );
+              */
+              signUpProcess(_email.text, _password.text);
+              print("BB");
             }
           });
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EmailSendRedirecting(_userEmail)));
         },
         child: Text("Sign-Up",
             textAlign: TextAlign.center,
@@ -255,6 +327,7 @@ class _SignUpPage extends State<SignUpPage> {
       ),
     );
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Sign-Up"),
       ),
@@ -270,7 +343,7 @@ class _SignUpPage extends State<SignUpPage> {
                 SizedBox(height: 25.0),
                 nameSurnameField,
                 SizedBox(height: 25.0),
-                mailField,
+                emailField,
                 SizedBox(height: 25.0),
                 passwordField,
                 SizedBox(height: 25.0),
@@ -285,19 +358,60 @@ class _SignUpPage extends State<SignUpPage> {
   }
 }
 
-class MainMenuPage extends StatelessWidget {
+class EmailSendRedirecting extends StatelessWidget {
+  final String _mail;
+  EmailSendRedirecting(this._mail);
+
   @override
   Widget build(BuildContext context) {
+    final signInButton = Material(
+      elevation: 5.0,
+      borderRadius: BorderRadius.circular(30.0),
+      color: Color(0xff01A0C7),
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SignInPage()),
+          );
+        },
+        child: Text("Sign-In",
+            textAlign: TextAlign.center,
+            style: style.copyWith(
+                color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Main Menu"),
+        title: Text("Redirecting.."),
       ),
       body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
+        child: Container(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(36.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('The verification mail has been sen to ' +
+                    _mail +
+                    '. Please check your E-Mail and verify your account'),
+                SizedBox(height: 50.0),
+                signInButton,
+                /*
+                Text(_success == null
+                    ? ''
+                    : (_success
+                        ? 'Successfully registered ' + _userEmail
+                        : 'Registration failed')),
+                */
+              ],
+            ),
+          ),
         ),
       ),
     );
