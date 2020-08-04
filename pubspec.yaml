@@ -21,6 +21,7 @@ dependencies:
   firebase_auth: ^0.14.0+5
   cloud_firestore: ^0.12.9+5
   firebase_dynamic_links: ^0.5.1
+  rflutter_alert: ^1.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -39,4 +40,4 @@ flutter:
         - asset: fonts/Montserrat-Regular.ttf
 
   assets:
-    - assets/photo_camera.png
+    - assets/argenova.png
