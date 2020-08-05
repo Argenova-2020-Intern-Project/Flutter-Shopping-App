@@ -22,7 +22,9 @@ class _SignInPage extends State<SignInPage> {
   bool _validateResetEmail = false;
   bool _validatePassword = false;
   bool _successSignIn;
-  Future<void> _resetPassword() async {
+  String errorMessage;
+
+  Future<void> _resetPassword() {
     Future<void> resetPassword(String email) async {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     }
@@ -70,7 +72,7 @@ class _SignInPage extends State<SignInPage> {
                     }
                   });
                 },
-                child: Text("Send Link to this E-Mail",
+                child: Text("Send link to this E-Mail",
                     textAlign: TextAlign.center,
                     style: style.copyWith(
                         color: Colors.white, fontWeight: FontWeight.bold)),
@@ -82,6 +84,39 @@ class _SignInPage extends State<SignInPage> {
     );
   }
 
+  Future<void> _signInWithEmailAndPassword() async {
+    FirebaseUser user;
+    try {
+      AuthResult result = await _auth.signInWithEmailAndPassword(
+        email: _email.text,
+        password: _password.text,
+      );
+      user = result.user;
+    } catch (e) {
+      switch (e.code) {
+        case "ERROR_INVALID_EMAIL":
+          errorMessage = "Your email address appears to be malformed.";
+          break;
+        case "ERROR_WRONG_PASSWORD":
+          errorMessage = "Wrong password";
+          break;
+        case "ERROR_USER_NOT_FOUND":
+          errorMessage = "This email doesn't exist";
+          break;
+        default:
+          errorMessage = "An undefined Error happened";
+      }
+    }
+
+    setState(() {
+      if (user != null) {
+        _successSignIn = true;
+      } else {
+        _successSignIn = false;
+      }
+    });
+  }
+  
   Widget build(BuildContext context) {
     final emailField = TextField(
       controller: _email,
@@ -106,54 +141,6 @@ class _SignInPage extends State<SignInPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
     );
-
-    Future<String> _signInWithEmailAndPassword() async {
-      FirebaseUser user;
-      String errorMessage;
-      try {
-        AuthResult result = await _auth.signInWithEmailAndPassword(
-          email: _email.text,
-          password: _password.text,
-        );
-        user = result.user;
-        setState(() {
-          if (user != null) {
-            _successSignIn = true;
-          } else {
-            _successSignIn = false;
-          }
-        });
-      } catch (error) {
-        switch (error.code) {
-          case "ERROR_INVALID_EMAIL":
-            errorMessage = "Your email address appears to be malformed.";
-            break;
-          case "ERROR_WRONG_PASSWORD":
-            errorMessage = "Your password is wrong.";
-            break;
-          case "ERROR_USER_NOT_FOUND":
-            errorMessage = "User with this email doesn't exist.";
-            break;
-          case "ERROR_USER_DISABLED":
-            errorMessage = "User with this email has been disabled.";
-            break;
-          case "ERROR_TOO_MANY_REQUESTS":
-            errorMessage = "Too many requests. Try again later.";
-            break;
-          case "ERROR_OPERATION_NOT_ALLOWED":
-            errorMessage = "Signing in with Email and Password is not enabled.";
-            break;
-          default:
-            errorMessage = "An undefined Error happened.";
-        }
-      }
-
-      if (errorMessage != null) {
-        return Future.error(errorMessage);
-      }
-
-      return user.uid;
-    }
 
     final signInButton = Material(
       elevation: 5.0,
@@ -210,7 +197,9 @@ class _SignInPage extends State<SignInPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          _resetPassword();
+          setState(() {
+            _resetPassword();
+          });
         },
         child: Text("Reset password",
             textAlign: TextAlign.center,
@@ -240,7 +229,7 @@ class _SignInPage extends State<SignInPage> {
                     ? ''
                     : (_successSignIn
                         ? 'Successfully signed as ' + _email.text
-                        : 'Sign-In failed')),
+                        : errorMessage.toString())),
                 SizedBox(height: 10.0),
                 signInButton,
                 SizedBox(height: 20.0),

@@ -7,7 +7,6 @@ class EmailSendRedirecting extends StatelessWidget {
   final String _mail;
   EmailSendRedirecting(this._mail);
 
-  @override
   Widget build(BuildContext context) {
     final signInButton = Material(
       elevation: 5.0,
@@ -28,6 +27,7 @@ class EmailSendRedirecting extends StatelessWidget {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(

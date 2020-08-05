@@ -22,7 +22,18 @@ class _SignUpPage extends State<SignUpPage> {
   bool _validatePassword = false;
   bool _termsCond = false;
 
-  @override
+  void signUpProcess(String email, String password) async {
+    FirebaseUser user = (await _firebaseAuth.createUserWithEmailAndPassword(
+            email: email, password: password))
+        .user;
+    try {
+      await user.sendEmailVerification();
+    } catch (e) {
+      print("An error occured while trying to send email verification");
+      print(e.message);
+    }
+  }
+
   Widget build(BuildContext context) {
     final nameSurnameField = TextField(
       controller: _name,
@@ -82,19 +93,6 @@ class _SignUpPage extends State<SignUpPage> {
       ],
     );
 
-    @override
-    void signUpProcess(String email, String password) async {
-      FirebaseUser user = (await _firebaseAuth.createUserWithEmailAndPassword(
-              email: email, password: password))
-          .user;
-      try {
-        await user.sendEmailVerification();
-      } catch (e) {
-        print("An error occured while trying to send email verification");
-        print(e.message);
-      }
-    }
-
     final signUpButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -130,6 +128,7 @@ class _SignUpPage extends State<SignUpPage> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
