@@ -127,13 +127,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1+2"
-  firebase_dynamic_links:
-    dependency: "direct main"
-    description:
-      name: firebase_dynamic_links
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -226,13 +219,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.3"
-  rflutter_alert:
-    dependency: "direct main"
-    description:
-      name: rflutter_alert
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   sky_engine:
     dependency: transitive
     description: flutter
