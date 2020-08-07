@@ -1,6 +1,7 @@
 
 enum AuthResultStatus {
   successful,
+  weakPassword,
   emailAlreadyExists,
   wrongPassword,
   invalidEmail,
@@ -16,6 +17,9 @@ class AuthExceptionHandler {
     print(e.code);
     var status;
     switch (e.code) {
+      case "ERROR_WEAK_PASSWORD":
+        status = AuthResultStatus.weakPassword;
+        break;
       case "ERROR_INVALID_EMAIL":
         status = AuthResultStatus.invalidEmail;
         break;
@@ -49,6 +53,9 @@ class AuthExceptionHandler {
   static generateExceptionMessage(exceptionCode) {
     String errorMessage;
     switch (exceptionCode) {
+      case AuthResultStatus.weakPassword:
+        errorMessage = "Your password is too weak. Try another one.";
+        break;
       case AuthResultStatus.invalidEmail:
         errorMessage = "Your email address appears to be malformed.";
         break;
