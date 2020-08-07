@@ -1,9 +1,9 @@
+import 'package:Intern/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/sign-up_page.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
-final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
 final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
 
@@ -21,17 +21,33 @@ class _SignInPage extends State<SignInPage> {
   bool _validateEmail = false;
   bool _validateResetEmail = false;
   bool _validatePassword = false;
-  bool _successSignIn;
-  String errorMessage;
+  AuthResultStatus _singInStat;
+  AuthResultStatus _passResetStat;
 
-  Future<void> _resetPassword() {
-    Future<void> resetPassword(String email) async {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
+  Future<AuthResultStatus> resetPassword({email}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print('Exception @createAccount: $e');
+      _passResetStat = AuthExceptionHandler.handleException(e);
     }
+    return _passResetStat;
+  }
 
-    return showDialog<void>(
+  _resetPassword() async {
+    final _status = await resetPassword(email: _resetEmail.text);
+    if (_status == AuthResultStatus.invalidEmail || 
+        _status == AuthResultStatus.userNotFound) {
+      final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
+      _errorAlertDialog(errorMsg);
+    } else {
+      //TODO
+    }
+  }
+
+  _resetPasswordScreen() {
+    return showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Reset Password'),
@@ -64,12 +80,7 @@ class _SignInPage extends State<SignInPage> {
                 padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                 onPressed: () {
                   setState(() {
-                    if (_resetEmail.text.isEmpty) {
-                      _validateResetEmail = true;
-                    } else {
-                      _validateResetEmail = false;
-                      resetPassword(_resetEmail.text);
-                    }
+                    _resetPassword();
                   });
                 },
                 child: Text("Send link to this E-Mail",
@@ -84,39 +95,46 @@ class _SignInPage extends State<SignInPage> {
     );
   }
 
-  Future<void> _signInWithEmailAndPassword() async {
-    FirebaseUser user;
+  Future<AuthResultStatus> signIn({email, pass}) async {
     try {
-      AuthResult result = await _auth.signInWithEmailAndPassword(
-        email: _email.text,
-        password: _password.text,
-      );
-      user = result.user;
-    } catch (e) {
-      switch (e.code) {
-        case "ERROR_INVALID_EMAIL":
-          errorMessage = "Your email address appears to be malformed.";
-          break;
-        case "ERROR_WRONG_PASSWORD":
-          errorMessage = "Wrong password";
-          break;
-        case "ERROR_USER_NOT_FOUND":
-          errorMessage = "This email doesn't exist";
-          break;
-        default:
-          errorMessage = "An undefined Error happened";
-      }
-    }
-
-    setState(() {
-      if (user != null) {
-        _successSignIn = true;
+      AuthResult result =
+          await _auth.signInWithEmailAndPassword(email: email, password: pass);
+      if (result.user != null) {
+        _singInStat = AuthResultStatus.successful;
       } else {
-        _successSignIn = false;
+        _singInStat = AuthResultStatus.undefined;
       }
-    });
+    } catch (e) {
+      print('Exception @createAccount: $e');
+      _singInStat = AuthExceptionHandler.handleException(e);
+    }
+    return _singInStat;
   }
-  
+
+  _signIn() async {
+    final _status = await signIn(email: _email.text, pass: _password.text);
+    if (_status == AuthResultStatus.successful) {
+      //TODO
+    } else {
+      final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
+      _errorAlertDialog(errorMsg);
+    }
+  }
+
+  _errorAlertDialog(errorMsg) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              'An Error Occured',
+              style: TextStyle(color: Colors.black),
+            ),
+            content: Text(errorMsg),
+          );
+        });
+  }
+
   Widget build(BuildContext context) {
     final emailField = TextField(
       controller: _email,
@@ -158,7 +176,7 @@ class _SignInPage extends State<SignInPage> {
                 ? _validatePassword = true
                 : _validatePassword = false;
             if (_password.text.isNotEmpty && _email.text.isNotEmpty) {
-              _signInWithEmailAndPassword();
+              _signIn();
             }
           });
         },
@@ -198,7 +216,7 @@ class _SignInPage extends State<SignInPage> {
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           setState(() {
-            _resetPassword();
+            _resetPasswordScreen();
           });
         },
         child: Text("Reset password",
@@ -224,13 +242,7 @@ class _SignInPage extends State<SignInPage> {
                 emailField,
                 SizedBox(height: 20.0),
                 passwordField,
-                SizedBox(height: 10.0),
-                Text(_successSignIn == null
-                    ? ''
-                    : (_successSignIn
-                        ? 'Successfully signed as ' + _email.text
-                        : errorMessage.toString())),
-                SizedBox(height: 10.0),
+                SizedBox(height: 20.0),
                 signInButton,
                 SizedBox(height: 20.0),
                 signUpButton,

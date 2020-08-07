@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/email-send_page.dart';
+import 'package:Intern/auth.dart';
 
-final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+final FirebaseAuth _authSignUp = FirebaseAuth.instance;
 
 final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
 
@@ -21,17 +22,51 @@ class _SignUpPage extends State<SignUpPage> {
   bool _validateEmail = false;
   bool _validatePassword = false;
   bool _termsCond = false;
+  AuthResultStatus _signUpStat;
 
-  void signUpProcess(String email, String password) async {
-    FirebaseUser user = (await _firebaseAuth.createUserWithEmailAndPassword(
-            email: email, password: password))
-        .user;
+  Future<AuthResultStatus> signUp({email, pass}) async {
     try {
+      AuthResult result = (await _authSignUp.createUserWithEmailAndPassword(
+          email: email, password: pass));
+      if (result.user != null) {
+        _signUpStat = AuthResultStatus.successful;
+      } else {
+        _signUpStat = AuthResultStatus.undefined;
+      }
+      FirebaseUser user = result.user;
       await user.sendEmailVerification();
     } catch (e) {
-      print("An error occured while trying to send email verification");
-      print(e.message);
+      print('Exception @createAccount: $e');
+      _signUpStat = AuthExceptionHandler.handleException(e);
     }
+    return _signUpStat;
+  }
+
+  _signUp() async {
+    final _status = await signUp(email: _email.text, pass: _password.text);
+    if (_status == AuthResultStatus.successful) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => EmailSendRedirecting(_email.text)),
+      );
+    } else {
+      final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
+      _errorAlertDialog(errorMsg);
+    }
+  }
+
+  _errorAlertDialog(errorMsg) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              'An Error Occured',
+              style: TextStyle(color: Colors.black),
+            ),
+            content: Text(errorMsg),
+          );
+        });
   }
 
   Widget build(BuildContext context) {
@@ -114,11 +149,7 @@ class _SignUpPage extends State<SignUpPage> {
                 _email.text.isNotEmpty &&
                 _name.text.isNotEmpty &&
                 _termsCond) {
-              signUpProcess(_email.text, _password.text);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EmailSendRedirecting(_email.text)));
+              _signUp();
             }
           });
         },
@@ -128,7 +159,7 @@ class _SignUpPage extends State<SignUpPage> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
