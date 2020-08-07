@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Intern/sign-in_page.dart';
-
-final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
-
+import 'package:Intern/main.dart' as ref;
 class EmailSendRedirecting extends StatelessWidget {
   final String _mail;
   EmailSendRedirecting(this._mail);
@@ -23,7 +21,7 @@ class EmailSendRedirecting extends StatelessWidget {
         },
         child: Text("Sign-In",
             textAlign: TextAlign.center,
-            style: style.copyWith(
+            style: ref.style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
@@ -31,7 +29,7 @@ class EmailSendRedirecting extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Redirecting..", style: style.copyWith(fontSize: 23)),
+        title: Text("Redirecting..", style: ref.style.copyWith(fontSize: 23)),
       ),
       body: Center(
         child: Container(
@@ -46,7 +44,7 @@ class EmailSendRedirecting extends StatelessWidget {
                     'The verification mail has been sent to ' +
                         _mail +
                         '. Please check your E-Mail and verify your account',
-                    style: style),
+                    style: ref.style),
                 SizedBox(height: 50.0),
                 signInButton,
               ],

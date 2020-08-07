@@ -1,11 +1,9 @@
-import 'package:Intern/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:Intern/auth.dart';
 import 'package:Intern/sign-up_page.dart';
-
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
-final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
+import 'package:Intern/reset-password_page.dart';
+import 'package:Intern/main.dart' as ref;
 
 class SignInPage extends StatefulWidget {
   @override
@@ -16,96 +14,21 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPage extends State<SignInPage> {
   final _email = TextEditingController();
-  final _resetEmail = TextEditingController();
   final _password = TextEditingController();
   bool _validateEmail = false;
-  bool _validateResetEmail = false;
   bool _validatePassword = false;
   AuthResultStatus _singInStat;
-  AuthResultStatus _passResetStat;
-
-  Future<AuthResultStatus> resetPassword({email}) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-    } catch (e) {
-      print('Exception @createAccount: $e');
-      _passResetStat = AuthExceptionHandler.handleException(e);
-    }
-    return _passResetStat;
-  }
-
-  _resetPassword() async {
-    final _status = await resetPassword(email: _resetEmail.text);
-    if (_status == AuthResultStatus.invalidEmail || 
-        _status == AuthResultStatus.userNotFound) {
-      final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
-      _errorAlertDialog(errorMsg);
-    } else {
-      //TODO
-    }
-  }
-
-  _resetPasswordScreen() {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Reset Password'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                TextField(
-                  controller: _resetEmail,
-                  obscureText: false,
-                  style: style,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                    labelText: "E-Mail",
-                    errorText:
-                        _validateResetEmail ? 'E-Mail can\'t be empty!' : null,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(40.0)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            Material(
-              elevation: 5.0,
-              borderRadius: BorderRadius.circular(30.0),
-              color: Color(0xff01A0C7),
-              child: MaterialButton(
-                minWidth: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                onPressed: () {
-                  setState(() {
-                    _resetPassword();
-                  });
-                },
-                child: Text("Send link to this E-Mail",
-                    textAlign: TextAlign.center,
-                    style: style.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Future<AuthResultStatus> signIn({email, pass}) async {
     try {
       AuthResult result =
-          await _auth.signInWithEmailAndPassword(email: email, password: pass);
+          await ref.auth.signInWithEmailAndPassword(email: email, password: pass);
       if (result.user != null) {
         _singInStat = AuthResultStatus.successful;
       } else {
         _singInStat = AuthResultStatus.undefined;
       }
     } catch (e) {
-      print('Exception @createAccount: $e');
       _singInStat = AuthExceptionHandler.handleException(e);
     }
     return _singInStat;
@@ -117,29 +40,15 @@ class _SignInPage extends State<SignInPage> {
       //TODO
     } else {
       final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
-      _errorAlertDialog(errorMsg);
+      ref.showErrorAlertDialog(context, errorMsg);
     }
-  }
-
-  _errorAlertDialog(errorMsg) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              'An Error Occured',
-              style: TextStyle(color: Colors.black),
-            ),
-            content: Text(errorMsg),
-          );
-        });
   }
 
   Widget build(BuildContext context) {
     final emailField = TextField(
       controller: _email,
       obscureText: false,
-      style: style,
+      style: ref.style,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         labelText: "E-Mail",
@@ -151,7 +60,7 @@ class _SignInPage extends State<SignInPage> {
     final passwordField = TextField(
       controller: _password,
       obscureText: true,
-      style: style,
+      style: ref.style,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         labelText: "Password",
@@ -182,7 +91,7 @@ class _SignInPage extends State<SignInPage> {
         },
         child: Text("Sign-In",
             textAlign: TextAlign.center,
-            style: style.copyWith(
+            style: ref.style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
@@ -202,7 +111,7 @@ class _SignInPage extends State<SignInPage> {
         },
         child: Text("Sign-Up",
             textAlign: TextAlign.center,
-            style: style.copyWith(
+            style: ref.style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
@@ -215,13 +124,11 @@ class _SignInPage extends State<SignInPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          setState(() {
-            _resetPasswordScreen();
-          });
+          showAlertDialog(context);
         },
         child: Text("Reset password",
             textAlign: TextAlign.center,
-            style: style.copyWith(
+            style: ref.style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );

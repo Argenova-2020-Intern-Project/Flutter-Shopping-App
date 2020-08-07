@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/email-send_page.dart';
 import 'package:Intern/auth.dart';
-
-final FirebaseAuth _authSignUp = FirebaseAuth.instance;
-
-final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
+import 'package:Intern/main.dart' as ref;
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -26,7 +23,7 @@ class _SignUpPage extends State<SignUpPage> {
 
   Future<AuthResultStatus> signUp({email, pass}) async {
     try {
-      AuthResult result = (await _authSignUp.createUserWithEmailAndPassword(
+      AuthResult result = (await ref.auth.createUserWithEmailAndPassword(
           email: email, password: pass));
       if (result.user != null) {
         _signUpStat = AuthResultStatus.successful;
@@ -36,7 +33,6 @@ class _SignUpPage extends State<SignUpPage> {
       FirebaseUser user = result.user;
       await user.sendEmailVerification();
     } catch (e) {
-      print('Exception @createAccount: $e');
       _signUpStat = AuthExceptionHandler.handleException(e);
     }
     return _signUpStat;
@@ -51,29 +47,15 @@ class _SignUpPage extends State<SignUpPage> {
       );
     } else {
       final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
-      _errorAlertDialog(errorMsg);
+      ref.showErrorAlertDialog(context, errorMsg);
     }
-  }
-
-  _errorAlertDialog(errorMsg) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              'An Error Occured',
-              style: TextStyle(color: Colors.black),
-            ),
-            content: Text(errorMsg),
-          );
-        });
   }
 
   Widget build(BuildContext context) {
     final nameSurnameField = TextField(
       controller: _name,
       obscureText: false,
-      style: style,
+      style: ref.style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           labelText: "Name-Surname",
@@ -85,7 +67,7 @@ class _SignUpPage extends State<SignUpPage> {
     final emailField = TextField(
       controller: _email,
       obscureText: false,
-      style: style,
+      style: ref.style,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         labelText: "E-Mail",
@@ -97,7 +79,7 @@ class _SignUpPage extends State<SignUpPage> {
     final passwordField = TextField(
       controller: _password,
       obscureText: true,
-      style: style,
+      style: ref.style,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         labelText: "Password",
@@ -155,7 +137,7 @@ class _SignUpPage extends State<SignUpPage> {
         },
         child: Text("Sign-Up",
             textAlign: TextAlign.center,
-            style: style.copyWith(
+            style: ref.style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
@@ -163,7 +145,7 @@ class _SignUpPage extends State<SignUpPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Sing-Up", style: style.copyWith(fontSize: 23)),
+        title: Text("Sing-Up", style: ref.style.copyWith(fontSize: 23)),
       ),
       body: Center(
         child: Container(

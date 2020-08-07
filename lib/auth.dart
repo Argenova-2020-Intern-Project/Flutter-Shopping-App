@@ -1,4 +1,3 @@
-
 enum AuthResultStatus {
   successful,
   weakPassword,
