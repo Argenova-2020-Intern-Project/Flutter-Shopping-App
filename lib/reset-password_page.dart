@@ -23,7 +23,22 @@ showAlertDialog(BuildContext context) {
       final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
       ref.showErrorAlertDialog(context, errorMsg);
     } else {
-      //TODO
+      showDialog(
+        context: context,
+        builder: (context) => new AlertDialog(
+          content: Text('The link that you can reset your password sent to ' 
+          + _resetEmail.text + '. Please check your E-Mail.', style: ref.style,),
+          actions: <Widget>[
+            new FlatButton(
+              child: Text('Sign-In', style: ref.style),
+              onPressed: () {
+                int count = 0;
+                Navigator.of(context).popUntil((_) => count++ >= 2);
+              }
+            )
+          ],
+        ),
+      );
     }
   }
 
