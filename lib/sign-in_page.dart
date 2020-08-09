@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/auth.dart';
 import 'package:Intern/sign-up_page.dart';
 import 'package:Intern/reset-password_page.dart';
+import 'package:Intern/bottom-nav-bar.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignInPage extends StatefulWidget {
@@ -21,8 +22,8 @@ class _SignInPage extends State<SignInPage> {
 
   Future<AuthResultStatus> signIn({email, pass}) async {
     try {
-      AuthResult result =
-          await ref.auth.signInWithEmailAndPassword(email: email, password: pass);
+      AuthResult result = await ref.auth
+          .signInWithEmailAndPassword(email: email, password: pass);
       if (result.user != null) {
         _singInStat = AuthResultStatus.successful;
       } else {
@@ -37,7 +38,10 @@ class _SignInPage extends State<SignInPage> {
   _signIn() async {
     final _status = await signIn(email: _email.text, pass: _password.text);
     if (_status == AuthResultStatus.successful) {
-      //TODO
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => BottomNavBar()),
+      );
     } else {
       final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
       ref.showErrorAlertDialog(context, errorMsg);
@@ -91,8 +95,8 @@ class _SignInPage extends State<SignInPage> {
         },
         child: Text("Sign-In",
             textAlign: TextAlign.center,
-            style: ref.style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ref.style
+                .copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
 
@@ -111,8 +115,8 @@ class _SignInPage extends State<SignInPage> {
         },
         child: Text("Sign-Up",
             textAlign: TextAlign.center,
-            style: ref.style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ref.style
+                .copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
 
@@ -128,8 +132,8 @@ class _SignInPage extends State<SignInPage> {
         },
         child: Text("Reset password",
             textAlign: TextAlign.center,
-            style: ref.style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ref.style
+                .copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
 
