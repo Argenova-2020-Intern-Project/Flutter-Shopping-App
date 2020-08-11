@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:Intern/email-send_page.dart';
-import 'package:Intern/auth.dart';
+import 'package:Intern/services/auth-helper.dart';
+import 'package:Intern/services/auth-errors.dart';
+import 'package:Intern/pages/email-send_page.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignUpPage extends StatefulWidget {
@@ -12,6 +12,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPage extends State<SignUpPage> {
+  AuthService authService = new AuthService();
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -19,31 +20,14 @@ class _SignUpPage extends State<SignUpPage> {
   bool _validateEmail = false;
   bool _validatePassword = false;
   bool _termsCond = false;
-  AuthResultStatus _signUpStat;
 
-  Future<AuthResultStatus> signUp({email, pass}) async {
-    try {
-      AuthResult result = (await ref.auth.createUserWithEmailAndPassword(
-          email: email, password: pass));
-      if (result.user != null) {
-        _signUpStat = AuthResultStatus.successful;
-      } else {
-        _signUpStat = AuthResultStatus.undefined;
-      }
-      FirebaseUser user = result.user;
-      await user.sendEmailVerification();
-    } catch (e) {
-      _signUpStat = AuthExceptionHandler.handleException(e);
-    }
-    return _signUpStat;
-  }
-
-  _signUp() async {
-    final _status = await signUp(email: _email.text, pass: _password.text);
+  signUp() async {
+    final _status = await authService.signUp(email: _email.text, pass: _password.text);
     if (_status == AuthResultStatus.successful) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => EmailSendRedirecting(_email.text)),
+        MaterialPageRoute(
+            builder: (context) => EmailSendRedirecting(_email.text)),
       );
     } else {
       final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
@@ -131,14 +115,14 @@ class _SignUpPage extends State<SignUpPage> {
                 _email.text.isNotEmpty &&
                 _name.text.isNotEmpty &&
                 _termsCond) {
-              _signUp();
+              signUp();
             }
           });
         },
         child: Text("Sign-Up",
             textAlign: TextAlign.center,
-            style: ref.style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ref.style
+                .copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
 

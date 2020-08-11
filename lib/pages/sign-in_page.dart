@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:Intern/auth.dart';
-import 'package:Intern/sign-up_page.dart';
-import 'package:Intern/reset-password_page.dart';
-import 'package:Intern/bottom-nav-bar.dart';
+import 'package:Intern/pages/sign-up_page.dart';
+import 'package:Intern/services/auth-errors.dart';
+import 'package:Intern/services/auth-helper.dart';
+import 'package:Intern/widget/bottom-nav-bar.dart';
+import 'package:Intern/pages/reset-password_page.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignInPage extends StatefulWidget {
@@ -14,29 +14,15 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPage extends State<SignInPage> {
+  AuthService authService = new AuthService();
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _validateEmail = false;
   bool _validatePassword = false;
-  AuthResultStatus _singInStat;
 
-  Future<AuthResultStatus> signIn({email, pass}) async {
-    try {
-      AuthResult result = await ref.auth
-          .signInWithEmailAndPassword(email: email, password: pass);
-      if (result.user != null) {
-        _singInStat = AuthResultStatus.successful;
-      } else {
-        _singInStat = AuthResultStatus.undefined;
-      }
-    } catch (e) {
-      _singInStat = AuthExceptionHandler.handleException(e);
-    }
-    return _singInStat;
-  }
-
-  _signIn() async {
-    final _status = await signIn(email: _email.text, pass: _password.text);
+  signIn() async {
+    final _status =
+        await authService.signIn(email: _email.text, pass: _password.text);
     if (_status == AuthResultStatus.successful) {
       Navigator.push(
         context,
@@ -89,7 +75,7 @@ class _SignInPage extends State<SignInPage> {
                 ? _validatePassword = true
                 : _validatePassword = false;
             if (_password.text.isNotEmpty && _email.text.isNotEmpty) {
-              _signIn();
+              signIn();
             }
           });
         },

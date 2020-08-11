@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:Intern/auth.dart';
+import 'package:Intern/services/auth-errors.dart';
+import 'package:Intern/services/auth-helper.dart';
 import 'package:Intern/main.dart' as ref;
 
 showAlertDialog(BuildContext context) {
-  AuthResultStatus _passResetStat;
+  AuthService authService = new AuthService();
   bool _validateResetEmail = false;
   final _resetEmail = TextEditingController();
 
-  Future<AuthResultStatus> resetPassword({email}) async {
-    try {
-      await ref.auth.sendPasswordResetEmail(email: email);
-    } catch (e) {
-      _passResetStat = AuthExceptionHandler.handleException(e);
-    }
-    return _passResetStat;
-  }
-
-  _resetPassword() async {
-    final _status = await resetPassword(email: _resetEmail.text);
+  resetPassword() async {
+    final _status = await authService.resetPassword(email: _resetEmail.text);
     if (_status == AuthResultStatus.invalidEmail ||
         _status == AuthResultStatus.userNotFound) {
       final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
@@ -77,7 +69,7 @@ showAlertDialog(BuildContext context) {
               minWidth: MediaQuery.of(context).size.width,
               padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
               onPressed: () {
-                _resetPassword();
+                resetPassword();
               },
               child: Text("Send link to this E-Mail",
                   textAlign: TextAlign.center,
