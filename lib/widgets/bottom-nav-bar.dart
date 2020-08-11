@@ -1,11 +1,10 @@
-import 'package:Intern/pages/chat_page.dart';
 import 'package:flutter/material.dart';
-import 'package:Intern/pages/home_page.dart';
-import 'package:Intern/pages/sell-stuff_page.dart';
-import 'package:Intern/pages/category_page.dart';
-import 'package:Intern/pages/profile_page.dart';
-import 'package:Intern/services/auth-helper.dart';
-import 'package:Intern/pages/sign-in_page.dart';
+import 'package:Intern/screens/home.dart';
+import 'package:Intern/screens/sell-stuff_page.dart';
+import 'package:Intern/screens/categories.dart';
+import 'package:Intern/screens/user-profile.dart';
+import 'package:Intern/services/authenticator.dart';
+import 'package:Intern/screens/sign-in.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -24,7 +23,7 @@ class _BottomNavBar extends State<BottomNavBar> {
         return HomePage();
         break;
       case 1:
-        return ChatModule();
+        return HomePage();
         break;
       case 2:
         return SellStuff();
