@@ -1,7 +1,6 @@
-import 'package:Intern/services/authenticator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/models/User.dart';
-import 'package:Intern/screens/messenger/chat_screen.dart';
+import 'package:Intern/views/messenger/chat_screen.dart';
 import 'package:Intern/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Intern/models/Message.dart';
 import 'package:Intern/models/User.dart';
 import 'package:Intern/services/authenticator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:Intern/main.dart' as ref;
 
 class DatabaseService {
   final CollectionReference userCollRef =
@@ -14,21 +16,11 @@ class DatabaseService {
 
   Future updateUser(User user) async {
     return await userCollRef.document(user.uid).setData({
-        'uid': user.uid,
-        'name': user.name,
-        'email': user.email,
-        'password': user.password,
+      'uid': user.uid,
+      'name': user.name,
+      'email': user.email,
+      'password': user.password,
     });
-  }
-
-  Future<User> getSpesificUser(String uid) async {
-    DocumentSnapshot dc = await userCollRef.document(uid).get();
-    return User(
-      uid: dc.documentID,
-      name: dc.data['name'],
-      password: dc.data['password'],
-      email: dc.data['email']
-    );
   }
 
   Future<List<User>> users({int limit, bool isFirst}) async {
@@ -46,14 +38,11 @@ class DatabaseService {
           .getDocuments();
 
     for (var dc in querySnapshot.documents) {
-      userList.add(
-        User(
+      userList.add(User(
           uid: dc.documentID,
           name: dc.data['name'],
           email: dc.data['email'],
-          password: dc.data['password']
-        )
-      );
+          password: dc.data['password']));
       lastUserDc = dc;
     }
     return userList;
@@ -67,14 +56,11 @@ class DatabaseService {
 
     for (var dc in querySnapshot.documents.where((element) =>
         element.data.toString().toLowerCase().contains(key.toLowerCase()))) {
-      userList.add(
-        User(
+      userList.add(User(
           uid: dc.documentID,
           name: dc.data['name'],
           email: dc.data['email'],
-          password: dc.data['password']
-        )
-      );
+          password: dc.data['password']));
     }
     return userList;
   }
@@ -113,5 +99,28 @@ class DatabaseService {
     for (var dc in querySnapshot.documents) {
       dc.reference.delete();
     }
+  }
+
+  Future changeName(String name) async {
+    FirebaseUser user = await ref.auth.currentUser();
+    userCollRef.document(user.uid).setData({
+      "name": name,
+    }, merge: true);
+  }
+
+  Future changeEmail(String email) async {
+    FirebaseUser user = await ref.auth.currentUser();
+    user.updateEmail(email);
+    userCollRef.document(user.uid).setData({
+      "email": email,
+    }, merge: true);
+  }
+
+  Future changePassword(String password) async {
+    FirebaseUser user = await ref.auth.currentUser();
+    user.updatePassword(password);
+    userCollRef.document(user.uid).setData({
+      "password": password,
+    }, merge: true);
   }
 }

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:Intern/screens/sell-stuff_page.dart';
-import 'package:Intern/screens/categories.dart';
+import 'package:Intern/views/sell-stuff_page.dart';
+import 'package:Intern/views/categories.dart';
 import 'package:Intern/services/authenticator.dart';
-import 'package:Intern/screens/user-profile.dart';
-import 'package:Intern/screens/home.dart';
-import 'package:Intern/screens/sign-in.dart';
-import 'package:Intern/screens/messenger/messenger.dart';
+import 'package:Intern/views/user-profile.dart';
+import 'package:Intern/views/home.dart';
+import 'package:Intern/views/messenger/messenger.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override

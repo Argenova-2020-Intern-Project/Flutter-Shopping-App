@@ -4,7 +4,6 @@ import 'package:Intern/helper/auth-errors.dart';
 import 'package:Intern/models/User.dart';
 import 'package:Intern/main.dart' as ref;
 
-
 class AuthService{
   AuthResultStatus _singInStat;
   AuthResultStatus _signUpStat;

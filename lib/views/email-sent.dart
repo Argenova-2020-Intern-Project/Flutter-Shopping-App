@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Intern/screens/sign-in.dart';
+import 'package:Intern/views/sign-in.dart';
 import 'package:Intern/main.dart' as ref;
 
 class EmailSendRedirecting extends StatelessWidget {

@@ -1,6 +1,6 @@
-import 'package:Intern/screens/sign-in.dart';
+import 'package:Intern/views/sign-in.dart';
 import 'package:flutter/material.dart';
-import 'package:Intern/screens/bottom-nav-bar.dart';
+import 'package:Intern/views/bottom-nav-bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 void main() => runApp(MyApp());
