@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Intern/services/authenticator.dart';
-import 'package:Intern/services/auth-errors.dart';
+import 'package:Intern/helper/auth-errors.dart';
 import 'package:Intern/screens/email-sent.dart';
-import 'package:Intern/services/shared.dart';
-import 'package:Intern/services/database.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignUpPage extends StatefulWidget {
@@ -17,7 +15,6 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPage extends State<SignUpPage> {
   AuthService authService = new AuthService();
-  DatabaseMethods databaseMethods = new DatabaseMethods();
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -32,18 +29,8 @@ class _SignUpPage extends State<SignUpPage> {
     if (formKey.currentState.validate()) {
       isLoading = true;
       final _status =
-          await authService.signUp(email: _email.text, pass: _password.text);
+          await authService.signUp(name:_name.text, email: _email.text, password: _password.text);
       if (_status == AuthResultStatus.successful) {
-        Map<String, String> userDataMap = {
-          "userName": _name.text,
-          "userEmail": _email.text,
-        };
-
-        databaseMethods.addUserInfo(userDataMap);
-
-        HelperFunctions.saveUserNameSharedPreference(_name.text);
-        HelperFunctions.saveUserEmailSharedPreference(_email.text);
-
         Navigator.push(
           context,
           MaterialPageRoute(

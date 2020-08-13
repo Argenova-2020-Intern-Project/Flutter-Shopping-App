@@ -1,12 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:Intern/screens/bottom-nav-bar.dart';
 import 'package:flutter/material.dart';
 import 'package:Intern/screens/sign-up.dart';
-import 'package:Intern/services/auth-errors.dart';
+import 'package:Intern/helper/auth-errors.dart';
 import 'package:Intern/services/authenticator.dart';
-import 'package:Intern/widgets/bottom-nav-bar.dart';
 import 'package:Intern/screens/reset-password.dart';
-import 'package:Intern/services/shared.dart';
-import 'package:Intern/services/database.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignInPage extends StatefulWidget {
@@ -33,14 +30,6 @@ class _SignInPage extends State<SignInPage> {
       final _status =
           await authService.signIn(email: _email.text, pass: _password.text);
       if (_status == AuthResultStatus.successful) {
-        QuerySnapshot userInfoSnapshot =
-            await DatabaseMethods().getUserInfo(_email.text);
-
-        HelperFunctions.saveUserNameSharedPreference(
-            userInfoSnapshot.documents[0].data["userName"]);
-        HelperFunctions.saveUserEmailSharedPreference(
-            userInfoSnapshot.documents[0].data["userEmail"]);
-
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => BottomNavBar()),

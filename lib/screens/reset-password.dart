@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Intern/services/auth-errors.dart';
+import 'package:Intern/helper/auth-errors.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/main.dart' as ref;
 
