@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Intern/models/Message.dart';
 import 'package:Intern/models/User.dart';
+import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/main.dart' as ref;
@@ -8,10 +9,13 @@ import 'package:Intern/main.dart' as ref;
 class DatabaseService {
   final CollectionReference userCollRef =
       Firestore.instance.collection('users');
+  final CollectionReference itemCollRef =
+      Firestore.instance.collection('items');
   final CollectionReference chatCollRef =
       Firestore.instance.collection('chats');
   final AuthService authService = AuthService();
 
+  DocumentSnapshot lastItemDc;
   DocumentSnapshot lastUserDc;
 
   Future updateUser(User user) async {
@@ -21,6 +25,15 @@ class DatabaseService {
       'email': user.email,
       'password': user.password,
     });
+  }
+
+  Future<User> getSpesificUser(String uid) async {
+    DocumentSnapshot dc = await userCollRef.document(uid).get();
+    return User(
+        uid: dc.documentID,
+        name: dc.data['name'],
+        email: dc.data['email'],
+        password: dc.data['password']);
   }
 
   Future<List<User>> users({int limit, bool isFirst}) async {
@@ -122,5 +135,103 @@ class DatabaseService {
     userCollRef.document(user.uid).setData({
       "password": password,
     }, merge: true);
+  }
+
+  Future insertItem(Item item) async {
+    var map = {
+      'author_id': item.author_id,
+      'title': item.title,
+      'explanation' : item.explanation,
+      'category' : item.category,
+      'location' : item.location,
+      'price' : item.price,
+      'date': item.date,
+      'views': item.views
+    };
+    await itemCollRef.add(map);
+  }
+
+  Future<List<Item>> items({int limit, bool isFirst}) async {
+    List<Item> itemList = List();
+    QuerySnapshot querySnapshot;
+    if (isFirst || lastItemDc == null)
+      querySnapshot = await itemCollRef
+          .orderBy('date', descending: true)
+          .limit(limit)
+          .getDocuments();
+    else
+      querySnapshot = await itemCollRef
+          .orderBy('date', descending: true)
+          .startAfterDocument(lastItemDc)
+          .limit(limit)
+          .getDocuments();
+
+    for (var dc in querySnapshot.documents) {
+      User author = await getSpesificUser(dc.data['author_id']);
+      itemList.add(Item.withAuthor(
+        item_uid: dc.documentID,
+        author: author,
+        title: dc.data['title'],
+        explanation: dc.data['explanation'],
+        category: dc.data['category'],
+        location: dc.data['location'],
+        price: dc.data['price'],
+        date: dc.data['date'],
+        views: dc.data['views']
+      ));
+      lastItemDc = dc;
+    }
+    return itemList;
+  }
+
+  Future<List<Item>> getSpesificItem(String author_id) async {
+    List<Item> itemList = List();
+    QuerySnapshot querySnapshot;
+    querySnapshot = await itemCollRef
+        .where('author_id', isEqualTo: author_id)
+        .getDocuments();
+
+    for (var dc in querySnapshot.documents) {
+      User author = await getSpesificUser(dc.data['author_id']);
+      itemList.add(Item.withAuthor(
+        item_uid: dc.documentID,
+        author: author,
+        title: dc.data['title'],
+        explanation: dc.data['explanation'],
+        category: dc.data['category'],
+        location: dc.data['location'],
+        price: dc.data['price'],
+        date: dc.data['date'],
+        views: dc.data['views']
+      ));
+    }
+    return itemList;
+  }
+
+  Future updateItem(Item item) async {
+    FirebaseUser firebaseUser = await authService.getCurrentUser();
+    if (firebaseUser.uid == item.author.uid) {
+      await itemCollRef.document(item.item_uid).setData({
+        'author_id': item.author_id,
+        'title': item.title,
+        'explanation' : item.explanation,
+        'category' : item.category,
+        'location' : item.location,
+        'price' : item.price,
+        'date': item.date,
+        'views': item.views
+      });
+      return 1;
+    } else
+      return null;
+  }
+
+  Future deleteItem(Item item) async {
+    FirebaseUser firebaseUser = await authService.getCurrentUser();
+    if (firebaseUser.uid == item.author.uid) {
+      await itemCollRef.document(item.item_uid).delete();
+      return 1;
+    } else
+      return null;
   }
 }

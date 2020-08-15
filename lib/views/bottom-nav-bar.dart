@@ -3,7 +3,7 @@ import 'package:Intern/views/sell-stuff_page.dart';
 import 'package:Intern/views/categories.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/views/user-profile.dart';
-import 'package:Intern/views/home.dart';
+import 'package:Intern/views/home/home.dart';
 import 'package:Intern/views/messenger/messenger.dart';
 
 class BottomNavBar extends StatefulWidget {

@@ -4,6 +4,7 @@ import 'package:Intern/views/sign-up.dart';
 import 'package:Intern/helper/auth-errors.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/views/reset-password.dart';
+import 'package:password/password.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignInPage extends StatefulWidget {
@@ -23,12 +24,14 @@ class _SignInPage extends State<SignInPage> {
   bool _validateEmail = false;
   bool _validatePassword = false;
   bool isLoading = false;
+  final algorithm = PBKDF2();
 
   signIn() async {
     if (formKey.currentState.validate()) {
       isLoading = true;
+      final hashedPassword = Password.hash(_password.text, algorithm);
       final _status =
-          await authService.signIn(email: _email.text, pass: _password.text);
+          await authService.signIn(email: _email.text, pass: hashedPassword);
       if (_status == AuthResultStatus.successful) {
         Navigator.push(
           context,
@@ -44,7 +47,7 @@ class _SignInPage extends State<SignInPage> {
     }
   }
 
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(

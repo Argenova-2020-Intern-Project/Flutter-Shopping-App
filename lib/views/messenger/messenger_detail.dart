@@ -3,6 +3,7 @@ import 'package:Intern/models/User.dart';
 import 'package:Intern/views/messenger/chat_screen.dart';
 import 'package:Intern/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import 'package:provider/provider.dart';
 
 class MessengerDetail extends StatefulWidget {
@@ -34,7 +35,11 @@ class MessengerDetailState extends State<MessengerDetail> {
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
+              FocusScope.of(context).unfocus();
               DatabaseService().deleteMessages(getChatId());
+              Toast.show('All messages have been deleted', 
+                context, duration: Toast.LENGTH_LONG, 
+                backgroundColor: ThemeData.dark().dialogBackgroundColor);
             },
           ),
         ],

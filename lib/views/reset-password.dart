@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Intern/helper/auth-errors.dart';
 import 'package:Intern/services/authenticator.dart';
+import 'package:toast/toast.dart';
 import 'package:Intern/main.dart' as ref;
 
 class ResetPasswordPage extends StatefulWidget {
@@ -31,25 +32,11 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
         final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
         ref.showErrorAlertDialog(context, errorMsg);
       } else {
-        showDialog(
-          context: context,
-          builder: (context) => new AlertDialog(
-            content: Text(
-              'The link that you can reset your password sent to ' +
+        Toast.show('The link that you can reset your password sent to ' +
                   _resetEmail.text +
-                  '. Please check your E-Mail.',
-              style: ref.textStyle,
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                  child: Text('Sign-In', style: ref.textStyle),
-                  onPressed: () {
-                    int count = 0;
-                    Navigator.of(context).popUntil((_) => count++ >= 2);
-                  })
-            ],
-          ),
-        );
+                  '. Please check your E-Mail.', context, duration: 6,
+        backgroundColor: ThemeData.dark().dialogBackgroundColor);
+        Navigator.of(context).pop();
       }
     }
   }
@@ -79,9 +66,7 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
           });
         },
         child: Text("Reset password",
-            textAlign: TextAlign.center,
-            style: ref.buttonTextStyle
-            ),
+            textAlign: TextAlign.center, style: ref.buttonTextStyle),
       ),
     );
 

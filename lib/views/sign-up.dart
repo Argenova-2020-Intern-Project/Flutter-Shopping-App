@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/helper/auth-errors.dart';
-import 'package:Intern/views/email-sent.dart';
+import 'package:password/password.dart';
+import 'package:toast/toast.dart';
 import 'package:Intern/main.dart' as ref;
 
 class SignUpPage extends StatefulWidget {
@@ -24,18 +25,21 @@ class _SignUpPage extends State<SignUpPage> {
   bool _validatePassword = false;
   bool _termsCond = false;
   bool isLoading = false;
+  final algorithm = PBKDF2();
 
   signUp() async {
     if (formKey.currentState.validate()) {
       isLoading = true;
+      final hashedPassword = Password.hash(_password.text, algorithm);
       final _status =
-          await authService.signUp(name:_name.text, email: _email.text, password: _password.text);
+          await authService.signUp(name:_name.text, email: _email.text, 
+          password: hashedPassword);
       if (_status == AuthResultStatus.successful) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => EmailSendRedirecting(_email.text)),
-        );
+        Toast.show('The verification mail has been sent to ' +
+          _email.text + '. Please check your E-Mail to verify your account', 
+          context, duration: 6, 
+          backgroundColor: ThemeData.dark().dialogBackgroundColor);
+        Navigator.of(context).pop();
       } else {
         setState(() {
           isLoading = false;
