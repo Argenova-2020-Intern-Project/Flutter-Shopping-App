@@ -8,7 +8,7 @@ class Item {
   String explanation;
   String category;
   String location;
-  double price;
+  String price;
   Timestamp date;
   DateTime time;
   int views;

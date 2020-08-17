@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
 class CustomDialogs {
-
   void updateItemDialog({BuildContext context, Item item, Function onSubmitDialog(Item item)}) {
     TextEditingController updateItemCrtl = TextEditingController();
     showDialog(context: context, builder: (context) {
       return AlertDialog(
-        title: Text("Yazıyı Güncelle"),
+        title: Text("Edit your item"),
         content: TextField(
           controller: updateItemCrtl..text = item.title,
           decoration: InputDecoration(
-              hintText: "Bir söz yazın..."
+              hintText: "Enter new title"
           ),
         ),
         elevation: 5,
@@ -27,7 +26,7 @@ class CustomDialogs {
               } else if (updateItemCrtl.text
                   .trim()
                   .isEmpty) {
-                Toast.show("Lütfen geçerli bir söz giriniz.", context,
+                Toast.show("Please fill the necessary boxes", context,
                     gravity: Toast.CENTER);
               } else {
                 item.title = updateItemCrtl.text;
@@ -36,7 +35,7 @@ class CustomDialogs {
                 onSubmitDialog.call(item);
               }
             },
-            child: Text("Gönder"),
+            child: Text("Update"),
           ),
         ],
       );

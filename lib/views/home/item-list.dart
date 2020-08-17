@@ -24,14 +24,14 @@ class _ItemList extends State<ItemList> {
   Future onDeleteItem(Item item) async {
     var result = await databaseService.deleteItem(item);
     if (result == null) {
-      Toast.show('fail_process', context,
+      Toast.show('There is something wrong about deleting your item', context,
           duration: Toast.LENGTH_LONG,
           backgroundColor: ThemeData.dark().dialogBackgroundColor);
     } else {
       setState(() {
         widget.itemList.remove(item);
         FocusScope.of(context).unfocus();
-        Toast.show('delete_success', context,
+        Toast.show('Your item successfully deleted', context,
             duration: Toast.LENGTH_LONG,
             backgroundColor: ThemeData.dark().dialogBackgroundColor);
       });
@@ -41,12 +41,12 @@ class _ItemList extends State<ItemList> {
   Future onUpdateItem(Item item) async {
     var result = await databaseService.updateItem(item);
     if (result == null) {
-      Toast.show('fail_process', context,
+      Toast.show('There is something wrong about updating your item', context,
           duration: Toast.LENGTH_LONG,
           backgroundColor: ThemeData.dark().dialogBackgroundColor);
     } else {
       setState(() {
-        Toast.show('update_success', context,
+        Toast.show('Your item successfully updated', context,
             duration: Toast.LENGTH_LONG,
             backgroundColor: ThemeData.dark().dialogBackgroundColor);
       });

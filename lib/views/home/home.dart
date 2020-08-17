@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/authenticator.dart';
@@ -11,6 +10,8 @@ import 'package:toast/toast.dart';
 import 'package:Intern/views/home/item-list.dart';
 
 class HomePage extends StatefulWidget {
+  static const String route_id = "/home";
+
   @override
   State<StatefulWidget> createState() {
     return _HomePage();
@@ -26,7 +27,7 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
   FirebaseUser user;
   var refreshKey = GlobalKey<RefreshIndicatorState>();
   final int maxItemFromScreen = 10;
-
+  
   Future getItems() async {
     user ??= await AuthService().getCurrentUser();
     return databaseService.items(limit: 5, isFirst: true);
@@ -35,20 +36,16 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
   Future onDeleteItem(Item item) async {
     var result = await databaseService.deleteItem(item);
     if (result == null) {
-      
-      Toast.show('fail_process', context,
+      Toast.show('There is something wrong about deleting your item', context,
           duration: Toast.LENGTH_LONG,
           backgroundColor: ThemeData.dark().dialogBackgroundColor);
-      
     } else {
       setState(() {
         itemList.remove(item);
         FocusScope.of(context).unfocus();
-        
-        Toast.show('delete_success', context,
+        Toast.show('Your item successfully deleted', context,
             duration: Toast.LENGTH_LONG,
             backgroundColor: ThemeData.dark().dialogBackgroundColor);
-        
       });
     }
   }
@@ -56,19 +53,15 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
   Future onUpdateItem(Item item) async {
     var result = await databaseService.updateItem(item);
     if (result == null) {
-      
-      Toast.show('fail_process', context,
+      Toast.show('There is something wrong about updating your item', context,
           duration: Toast.LENGTH_LONG,
           backgroundColor: ThemeData.dark().dialogBackgroundColor);
-      
     } else {
-      
       setState(() {
-        Toast.show('update_success', context,
+        Toast.show('Your item successfully updated', context,
             duration: Toast.LENGTH_LONG,
             backgroundColor: ThemeData.dark().dialogBackgroundColor);
       });
-      
     }
   }
 
@@ -100,20 +93,10 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = AuthService();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('app_title'),
-        actions: [
-          IconButton(
-            onPressed: () => authService.signOut(),
-            icon: Icon(
-              Icons.power_settings_new,
-              color: Colors.red,
-            ),
-          )
-        ],
+        automaticallyImplyLeading: false,
+        title: Text('Dashboard'),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -125,13 +108,6 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
             child: Column(
               children: <Widget>[
-                buildShareWidget(),
-                DividerTheme(
-                  data: ThemeData.dark().dividerTheme,
-                  child: Divider(
-                    height: 30,
-                  ),
-                ),
                 Expanded(
                   child: FutureBuilder(
                     future: getItems(),
@@ -152,60 +128,6 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
                 )
               ],
             )),
-      ),
-    );
-  }
-
-  Widget buildShareWidget() {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Form(
-                key: formKey,
-                child: TextFormField(
-                  autofocus: false,
-                  keyboardType: TextInputType.text,
-                  validator: validateItem,
-                  minLines: 1,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'share_placeholder',
-                  ),
-                  controller: itemCtrl,
-                ),
-              ),
-            ),
-            RaisedButton(
-              onPressed: () async {
-                if (formKey.currentState.validate()) {
-                  String content = itemCtrl.text;
-                  itemCtrl.clear();
-                  user ??= await AuthService().getCurrentUser();
-                  Item item = Item(
-                      title: content,
-                      author_id: user.uid,
-                      date: Timestamp.now());
-                  databaseService.insertItem(item).then((value) {
-                    Toast.show('item_share_sucess', context,
-                        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                    setState(() {
-                      itemList.add(item);
-                    });
-                  });
-                }
-                FocusScope.of(context).unfocus();
-              },
-              child: Text('share'),
-            )
-          ],
-        ),
       ),
     );
   }

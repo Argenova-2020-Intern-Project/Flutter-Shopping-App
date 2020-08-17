@@ -1,5 +1,4 @@
 import 'package:Intern/models/Item.dart';
-import 'package:Intern/views/user-profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -11,26 +10,31 @@ class ItemTile extends StatelessWidget {
   final BuildContext context;
   String dateTxt;
 
-  ItemTile({@required this.context, this.isAuthor, this.item, this.update, this.delete});
+  ItemTile(
+      {@required this.context,
+      this.isAuthor,
+      this.item,
+      this.update,
+      this.delete});
 
   String getDate(Duration dr) {
     if (dr.inDays >= 365) {
       // 1 yıl önce
-      return "${(dr.inDays / 365).round()} " + 'years_ago';
+      return "${(dr.inDays / 365).round()} " + 'years ago';
     } else if (dr.inDays >= 7) {
       // 1 hafta önce
-      return "${(dr.inDays / 7).round()} " + 'weeks_ago';
+      return "${(dr.inDays / 7).round()} " + 'weeks ago';
     } else if (dr.inDays >= 1) {
       // 1 gün önce
-      return "${dr.inDays} " + 'days_ago';
+      return "${dr.inDays} " + 'days ago';
     } else if (dr.inHours >= 1) {
       // 1 saat önce
-      return "${dr.inHours} " + 'hours_ago';
+      return "${dr.inHours} " + 'hours ago';
     } else if (dr.inMinutes >= 1) {
-      return "${dr.inMinutes} " + 'minutes_ago';
+      return "${dr.inMinutes} " + 'minutes ago';
     } else if (dr.inSeconds >= 1) {
       // saniye önce
-      return "${dr.inSeconds} " + 'seconds_ago';
+      return "${dr.inSeconds} " + 'seconds ago';
     } else {
       return 'now';
     }
@@ -47,6 +51,7 @@ class ItemTile extends StatelessWidget {
       default:
         return null;
     }
+    return null;
   }
 
   @override
@@ -65,7 +70,7 @@ class ItemTile extends StatelessWidget {
             DecoratedBox(
               position: DecorationPosition.background,
               decoration: BoxDecoration(
-                color: Colors.black54,
+                color: Colors.lightBlue,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
               ),
               child: Padding(
@@ -76,20 +81,14 @@ class ItemTile extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, UserProfile.route_id,
-                              arguments: UserProfile(
-                                isAuthor: isAuthor,
-                                user: item.author,
-                              ));
-                        },
-                        child: Text.rich(
-                            TextSpan(text: "${item.author.name}\n• ", children: [
-                          TextSpan(
-                              text: dateTxt,
-                              style: TextStyle(
-                                  fontSize: 11, color: Colors.white60)),
-                        ])),
+                        child: Text.rich(TextSpan(
+                            text: "${item.author.name}\n• ",
+                            children: [
+                              TextSpan(
+                                  text: dateTxt,
+                                  style: TextStyle(
+                                      fontSize: 11, color: Colors.black)),
+                            ])),
                       ),
                     ),
                     Spacer(),
@@ -100,10 +99,9 @@ class ItemTile extends StatelessWidget {
                             tooltip: 'more',
                             onSelected: onTapVert,
                             itemBuilder: (context) => <PopupMenuItem<int>>[
+                              PopupMenuItem<int>(child: Text('Edit'), value: 0),
                               PopupMenuItem<int>(
-                                  child: Text('edit'), value: 0),
-                              PopupMenuItem<int>(
-                                  child: Text('remove'), value: 1),
+                                  child: Text('Remove'), value: 1),
                             ],
                           )
                         : SizedBox(),
@@ -111,9 +109,19 @@ class ItemTile extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 20),
-              child: Text(item.title, textAlign: TextAlign.center),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                child: Padding(
+                  padding: EdgeInsets.all(36),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(item.title, textAlign: TextAlign.left),
+                      ]),
+                ),
+              ),
             ),
           ],
         ));
