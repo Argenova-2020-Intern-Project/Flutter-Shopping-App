@@ -42,34 +42,6 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
   }
 
   Widget build(BuildContext context) {
-    final emailField = TextField(
-      controller: _resetEmail,
-      style: ref.textStyle,
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        labelText: "E-Mail",
-        errorText: _validateResetEmail ? 'E-Mail can\'t be empty!' : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-      ),
-    );
-
-    final resetPasswordButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: ref.buttonColor,
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {
-          setState(() {
-            resetPassword();
-          });
-        },
-        child: Text("Reset password",
-            textAlign: TextAlign.center, style: ref.buttonTextStyle),
-      ),
-    );
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -90,9 +62,33 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      emailField,
+                      TextField(
+                        controller: _resetEmail,
+                        style: ref.textStyle,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                          labelText: "E-Mail",
+                          errorText: _validateResetEmail ? 'E-Mail can\'t be empty!' : null,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+                        ),
+                      ),
                       SizedBox(height: 20.0),
-                      resetPasswordButton,
+                      Material(
+                        elevation: 5.0,
+                        borderRadius: BorderRadius.circular(30.0),
+                        color: ref.buttonColor,
+                        child: MaterialButton(
+                          minWidth: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                          onPressed: () {
+                            setState(() {
+                              resetPassword();
+                            });
+                          },
+                          child: Text("Reset password",
+                              textAlign: TextAlign.center, style: ref.buttonTextStyle),
+                        ),
+                      ),
                     ],
                   ),
                 ),

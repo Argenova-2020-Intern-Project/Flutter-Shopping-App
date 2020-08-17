@@ -8,7 +8,7 @@ import 'package:toast/toast.dart';
 import 'package:Intern/main.dart' as ref;
 
 class UserProfile extends StatefulWidget {
-  static const String route_id = "/profile";
+  static const String route_id = "/user-profile";
   final User user;
   final bool isAuthor;
 
@@ -92,7 +92,7 @@ class _UserProfile extends State<UserProfile> {
                                             .changeName(_newName.text);
                                         Navigator.of(context).pop();
                                         Toast.show(
-                                            'Name successfully changed to ' +
+                                            'Your name successfully changed to ' +
                                                 _newName.text,
                                             context,
                                             duration: Toast.LENGTH_LONG,
@@ -153,7 +153,7 @@ class _UserProfile extends State<UserProfile> {
                                             .changeEmail(_newEmail.text);
                                         Navigator.of(context).pop();
                                         Toast.show(
-                                            'E-Mail successfully changed to ' +
+                                            'Your E-Mail successfully changed to ' +
                                                 _newEmail.text,
                                             context,
                                             duration: Toast.LENGTH_LONG,
@@ -216,7 +216,7 @@ class _UserProfile extends State<UserProfile> {
                                             .changePassword(hashedPassword);
                                         Navigator.of(context).pop();
                                         Toast.show(
-                                            'E-Mail successfully changed',
+                                            'Your password successfully changed',
                                             context,
                                             duration: Toast.LENGTH_LONG,
                                             backgroundColor: ThemeData.dark()
