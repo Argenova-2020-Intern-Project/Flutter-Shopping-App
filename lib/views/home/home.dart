@@ -22,7 +22,7 @@ class _HomePage extends State<HomePage> with ItemValidationMixin {
   List<Item> itemList = List();
   FirebaseUser user;
   final int maxItemFromScreen = 10;
-
+  
   Future getItems() async {
     user ??= await AuthService().getCurrentUser();
     return databaseService.items(limit: 5, isFirst: true);
