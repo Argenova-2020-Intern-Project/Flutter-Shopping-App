@@ -137,20 +137,6 @@ class DatabaseService {
     }, merge: true);
   }
 
-  Future insertItem(Item item) async {
-    var map = {
-      'author_id': item.author_id,
-      'title': item.title,
-      'explanation' : item.explanation,
-      'category' : item.category,
-      'location' : item.location,
-      'price' : item.price,
-      'date': item.date,
-      'views': item.views
-    };
-    await itemCollRef.add(map);
-  }
-
   Future<List<Item>> items({int limit, bool isFirst}) async {
     List<Item> itemList = List();
     QuerySnapshot querySnapshot;
@@ -169,16 +155,15 @@ class DatabaseService {
     for (var dc in querySnapshot.documents) {
       User author = await getSpesificUser(dc.data['author_id']);
       itemList.add(Item.withAuthor(
-        item_uid: dc.documentID,
-        author: author,
-        title: dc.data['title'],
-        explanation: dc.data['explanation'],
-        category: dc.data['category'],
-        location: dc.data['location'],
-        price: dc.data['price'],
-        date: dc.data['date'],
-        views: dc.data['views']
-      ));
+          item_uid: dc.documentID,
+          author: author,
+          title: dc.data['title'],
+          explanation: dc.data['explanation'],
+          category: dc.data['category'],
+          location: dc.data['location'],
+          price: dc.data['price'],
+          date: dc.data['date'],
+          views: dc.data['views']));
       lastItemDc = dc;
     }
     return itemList;
@@ -194,33 +179,63 @@ class DatabaseService {
     for (var dc in querySnapshot.documents) {
       User author = await getSpesificUser(dc.data['author_id']);
       itemList.add(Item.withAuthor(
-        item_uid: dc.documentID,
-        author: author,
-        title: dc.data['title'],
-        explanation: dc.data['explanation'],
-        category: dc.data['category'],
-        location: dc.data['location'],
-        price: dc.data['price'],
-        date: dc.data['date'],
-        views: dc.data['views']
-      ));
+          item_uid: dc.documentID,
+          author: author,
+          title: dc.data['title'],
+          explanation: dc.data['explanation'],
+          category: dc.data['category'],
+          location: dc.data['location'],
+          price: dc.data['price'],
+          date: dc.data['date'],
+          views: dc.data['views']));
     }
     return itemList;
+  }
+
+  Future insertItem(Item item) async {
+    var map = {
+      'author_id': item.author_id,
+      'title': item.title,
+      'explanation': item.explanation,
+      'category': item.category,
+      'location': item.location,
+      'price': item.price,
+      'date': item.date,
+      'views': item.views
+    };
+    await itemCollRef.add(map);
   }
 
   Future updateItem(Item item) async {
     FirebaseUser firebaseUser = await authService.getCurrentUser();
     if (firebaseUser.uid == item.author.uid) {
-      await itemCollRef.document(item.item_uid).setData({
-        'author_id': item.author_id,
-        'title': item.title,
-        'explanation' : item.explanation,
-        'category' : item.category,
-        'location' : item.location,
-        'price' : item.price,
-        'date': item.date,
-        'views': item.views
-      });
+      if (item.title.isNotEmpty) {
+        await itemCollRef.document(item.item_uid).setData({
+          'title': item.title,
+        }, merge: true);
+      }
+      if (item.explanation.isNotEmpty) {
+        await itemCollRef.document(item.item_uid).setData({
+          'explanation': item.explanation,
+        }, merge: true);
+      }
+      
+      if ((item.category?.isNotEmpty ?? true)) {
+        await itemCollRef.document(item.item_uid).setData({
+          'category': item.category,
+        }, merge: true);
+      }
+      
+      if (item.location.isNotEmpty) {
+        await itemCollRef.document(item.item_uid).setData({
+          'location': item.location,
+        }, merge: true);
+      }
+      if (item.price.isNotEmpty) {
+        await itemCollRef.document(item.item_uid).setData({
+          'price': item.price,
+        }, merge: true);
+      }
       return 1;
     } else
       return null;

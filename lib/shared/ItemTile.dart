@@ -64,13 +64,13 @@ class ItemTile extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         elevation: 10,
-        margin: EdgeInsets.symmetric(vertical: 10),
+        margin: EdgeInsets.symmetric(vertical: 5),
         child: Column(
           children: [
             DecoratedBox(
               position: DecorationPosition.background,
               decoration: BoxDecoration(
-                color: Colors.lightBlue,
+                color: Colors.blue,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
               ),
               child: Padding(
@@ -80,16 +80,19 @@ class ItemTile extends StatelessWidget {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        child: Text.rich(TextSpan(
+                        child: Text.rich(
+                          TextSpan(
                             text: "${item.author.name}\n• ",
                             children: [
                               TextSpan(
                                   text: dateTxt,
                                   style: TextStyle(
-                                      fontSize: 11, color: Colors.black)),
-                            ])),
-                      ),
+                                      fontSize: 11, color: Colors.black
+                                  )
+                              ),
+                            ]
+                          )
+                        ),
                     ),
                     Spacer(),
                     isAuthor
@@ -118,7 +121,11 @@ class ItemTile extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text(item.title, textAlign: TextAlign.left),
+                        Text('Title: ' + item.title, textAlign: TextAlign.left),
+                        Text('Explanation: ' + item.explanation, textAlign: TextAlign.left),
+                        Text('Category: ' + item.category, textAlign: TextAlign.left),
+                        Text('Location: ' + item.location, textAlign: TextAlign.left),
+                        Text('Price: ' + item.price, textAlign: TextAlign.left),
                       ]),
                 ),
               ),

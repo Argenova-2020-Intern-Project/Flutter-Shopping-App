@@ -26,7 +26,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
   bool validatePrice = false;
   final TextEditingController itemTitle = TextEditingController();
   final TextEditingController itemExplanation = TextEditingController();
-  String _category;
+  String itemCategory;
   final TextEditingController itemLocation = TextEditingController();
   final TextEditingController itemPrice = TextEditingController();
   final DatabaseService databaseService = DatabaseService();
@@ -36,10 +36,6 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
   Future getItems() async {
     user ??= await AuthService().getCurrentUser();
     return databaseService.items(limit: 5, isFirst: true);
-  }
-
-  Future getCurrUser() async{
-    user ??= await AuthService().getCurrentUser();
   }
 
   @override
@@ -166,7 +162,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                             border: InputBorder.none,
                           ),
                           onChanged: (value) {
-                            _category = value;
+                            itemCategory = value;
                           },
                           hint: Text("Please select the category of your item"),
                         ),
@@ -235,7 +231,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                               itemExplanation.text.isEmpty
                                   ? validateExplanation = true
                                   : validateExplanation = false;
-                              _category.isEmpty
+                              itemCategory.isEmpty
                                   ? validateCategory = true
                                   : validateCategory = false;
                               itemLocation.text.isEmpty
@@ -244,38 +240,41 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                               itemPrice.text.isEmpty
                                   ? validatePrice = true
                                   : validatePrice = false;
-                              if (itemTitle.text.isNotEmpty &&
-                                  itemExplanation.text.isNotEmpty &&
-                                  _category.isNotEmpty &&
-                                  itemLocation.text.isNotEmpty &&
-                                  itemPrice.text.isNotEmpty) {
-                                String title = itemTitle.text;
-                                String explanation = itemExplanation.text;
-                                String category = _category;
-                                String location = itemLocation.text;
-                                String price = itemPrice.text;
-                                itemTitle.clear();
-                                itemExplanation.clear();
-                                itemLocation.clear();
-                                itemPrice.clear();
-                                getCurrUser();
-                                Item item = Item(
-                                    title: title,
-                                    explanation: explanation,
-                                    category: category,
-                                    location: location,
-                                    price: price,
-                                    author_id: user.uid,
-                                    date: Timestamp.now());
-                                databaseService.insertItem(item).then((value) {
-                                    itemList.add(item);
-                                  Toast.show(
-                                      'Your item posted successfully!', context,
-                                      duration: Toast.LENGTH_LONG,
-                                      gravity: Toast.BOTTOM);
-                                });
-                              }
                             });
+                            if (itemTitle.text.isNotEmpty &&
+                                itemExplanation.text.isNotEmpty &&
+                                (itemCategory?.isNotEmpty ?? true) &&
+                                itemLocation.text.isNotEmpty &&
+                                itemPrice.text.isNotEmpty) {
+                              String title = itemTitle.text;
+                              String explanation = itemExplanation.text;
+                              String category = itemCategory;
+                              String location = itemLocation.text;
+                              String price = itemPrice.text;
+                              itemTitle.clear();
+                              itemExplanation.clear();
+                              itemLocation.clear();
+                              itemPrice.clear();
+
+                              user ??= await AuthService().getCurrentUser();
+                              Item item = Item(
+                                  title: title,
+                                  explanation: explanation,
+                                  category: category,
+                                  location: location,
+                                  price: price,
+                                  author_id: user.uid,
+                                  date: Timestamp.now());
+                              databaseService.insertItem(item).then((value) {
+                                setState(() {
+                                  itemList.add(item);
+                                });
+                                Toast.show(
+                                    'Your item posted successfully!', context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
+                              });
+                            }
                           },
                           child: Text("Post your item",
                               textAlign: TextAlign.center,

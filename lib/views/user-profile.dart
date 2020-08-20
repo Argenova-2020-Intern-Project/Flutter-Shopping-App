@@ -30,7 +30,6 @@ class _UserProfile extends State<UserProfile> {
   bool _validateNewName = false;
   bool _validateNewEmail = false;
   bool _validateNewPassword = false;
-  String currUserEmail;
   final algorithm = PBKDF2();
 
   Widget build(BuildContext context) {
@@ -69,14 +68,14 @@ class _UserProfile extends State<UserProfile> {
                                 style: ref.textStyle,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.fromLTRB(
-                                      20.0, 15.0, 20.0, 15.0),
+                                    20.0, 15.0, 20.0, 15.0),
                                   labelText: "Name-Surname",
                                   errorText: _validateNewName
-                                      ? 'Name-Surname can\'t be empty!'
-                                      : null,
+                                    ? 'Name-Surname can\'t be empty!'
+                                    : null,
                                   border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(32.0)),
+                                    borderRadius:
+                                      BorderRadius.circular(32.0)),
                                 ),
                               ),
                               actions: <Widget>[
@@ -85,19 +84,19 @@ class _UserProfile extends State<UserProfile> {
                                   onPressed: () {
                                     setState(() {
                                       _newName.text.isEmpty
-                                          ? _validateNewName = true
-                                          : _validateNewName = false;
+                                        ? _validateNewName = true
+                                        : _validateNewName = false;
                                       if (_newName.text.isNotEmpty) {
                                         databaseService
-                                            .changeName(_newName.text);
+                                          .changeName(_newName.text);
                                         Navigator.of(context).pop();
                                         Toast.show(
-                                            'Your name successfully changed to ' +
-                                                _newName.text,
-                                            context,
-                                            duration: Toast.LENGTH_LONG,
-                                            backgroundColor: ThemeData.dark()
-                                                .dialogBackgroundColor);
+                                          'Your name successfully changed to ' +
+                                            _newName.text,
+                                          context,
+                                          duration: Toast.LENGTH_LONG,
+                                          backgroundColor: ThemeData.dark()
+                                            .dialogBackgroundColor);
                                       }
                                     });
                                   },
@@ -107,8 +106,8 @@ class _UserProfile extends State<UserProfile> {
                           );
                         },
                         child: Text("Change Name",
-                            textAlign: TextAlign.center,
-                            style: ref.buttonTextStyle),
+                          textAlign: TextAlign.center,
+                          style: ref.buttonTextStyle),
                       ),
                     ),
                     SizedBox(height: 20.0),
@@ -130,14 +129,14 @@ class _UserProfile extends State<UserProfile> {
                                 style: ref.textStyle,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.fromLTRB(
-                                      20.0, 15.0, 20.0, 15.0),
+                                    20.0, 15.0, 20.0, 15.0),
                                   labelText: "E-Mail",
                                   errorText: _validateNewEmail
-                                      ? 'E-mail can\'t be empty!'
-                                      : null,
+                                    ? 'E-mail can\'t be empty!'
+                                    : null,
                                   border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(32.0)),
+                                    borderRadius:
+                                      BorderRadius.circular(32.0)),
                                 ),
                               ),
                               actions: <Widget>[
@@ -150,15 +149,15 @@ class _UserProfile extends State<UserProfile> {
                                           : _validateNewEmail = false;
                                       if (_newEmail.text.isNotEmpty) {
                                         databaseService
-                                            .changeEmail(_newEmail.text);
+                                          .changeEmail(_newEmail.text);
                                         Navigator.of(context).pop();
                                         Toast.show(
-                                            'Your E-Mail successfully changed to ' +
-                                                _newEmail.text,
-                                            context,
-                                            duration: Toast.LENGTH_LONG,
-                                            backgroundColor: ThemeData.dark()
-                                                .dialogBackgroundColor);
+                                          'Your E-Mail successfully changed to ' +
+                                            _newEmail.text,
+                                          context,
+                                          duration: Toast.LENGTH_LONG,
+                                          backgroundColor: ThemeData.dark()
+                                            .dialogBackgroundColor);
                                       }
                                     });
                                   },
@@ -168,8 +167,8 @@ class _UserProfile extends State<UserProfile> {
                           );
                         },
                         child: Text("Change E-mail",
-                            textAlign: TextAlign.center,
-                            style: ref.buttonTextStyle),
+                          textAlign: TextAlign.center,
+                          style: ref.buttonTextStyle),
                       ),
                     ),
                     SizedBox(height: 20.0),
@@ -191,14 +190,14 @@ class _UserProfile extends State<UserProfile> {
                                 style: ref.textStyle,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.fromLTRB(
-                                      20.0, 15.0, 20.0, 15.0),
+                                    20.0, 15.0, 20.0, 15.0),
                                   labelText: "Password",
                                   errorText: _validateNewPassword
-                                      ? 'Password can\'t be empty!'
-                                      : null,
+                                    ? 'Password can\'t be empty!'
+                                    : null,
                                   border: OutlineInputBorder(
                                       borderRadius:
-                                          BorderRadius.circular(32.0)),
+                                        BorderRadius.circular(32.0)),
                                 ),
                               ),
                               actions: <Widget>[
@@ -206,21 +205,21 @@ class _UserProfile extends State<UserProfile> {
                                   child: Text("Change"),
                                   onPressed: () {
                                     final hashedPassword = Password.hash(
-                                        _newPassword.text, algorithm);
+                                      _newPassword.text, algorithm);
                                     setState(() {
                                       _newPassword.text.isEmpty
                                           ? _validateNewPassword = true
                                           : _validateNewPassword = false;
                                       if (_newPassword.text.isNotEmpty) {
                                         databaseService
-                                            .changePassword(hashedPassword);
+                                          .changePassword(hashedPassword);
                                         Navigator.of(context).pop();
                                         Toast.show(
-                                            'Your password successfully changed',
-                                            context,
-                                            duration: Toast.LENGTH_LONG,
-                                            backgroundColor: ThemeData.dark()
-                                                .dialogBackgroundColor);
+                                          'Your password successfully changed',
+                                          context,
+                                          duration: Toast.LENGTH_LONG,
+                                          backgroundColor: ThemeData.dark()
+                                          .dialogBackgroundColor);
                                       }
                                     });
                                   },
@@ -230,8 +229,8 @@ class _UserProfile extends State<UserProfile> {
                           );
                         },
                         child: Text("Change Password",
-                            textAlign: TextAlign.center,
-                            style: ref.buttonTextStyle),
+                          textAlign: TextAlign.center,
+                          style: ref.buttonTextStyle),
                       ),
                     ),
                     SizedBox(height: 20.0),
@@ -243,27 +242,27 @@ class _UserProfile extends State<UserProfile> {
                         minWidth: MediaQuery.of(context).size.width,
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         onPressed: () {
-                          ref.auth.currentUser().then((value) {
-                            databaseService
-                                .getSpesificUser(value.uid)
-                                .then((value) {
-                              currUserEmail = value.email;
+                          setState(() {
+                            ref.auth.currentUser().then((value) {
+                              databaseService.getSpesificUser(value.uid).then((value) {
+                                Toast.show('Signed out as ' + value.email, context,
+                                  duration: 3,
+                                  backgroundColor:
+                                  ThemeData.dark().dialogBackgroundColor
+                                );
+                                authService.signOut();
+                              });
                             });
                           });
-                          Toast.show('Signed out as ' + currUserEmail, context,
-                              duration: Toast.LENGTH_LONG,
-                              backgroundColor:
-                                  ThemeData.dark().dialogBackgroundColor);
-                          authService.signOut();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SignInPage()),
+                              builder: (context) => SignInPage()),
                           );
                         },
                         child: Text("Sign Out",
-                            textAlign: TextAlign.center,
-                            style: ref.buttonTextStyle),
+                          textAlign: TextAlign.center,
+                          style: ref.buttonTextStyle),
                       ),
                     ),
                   ],

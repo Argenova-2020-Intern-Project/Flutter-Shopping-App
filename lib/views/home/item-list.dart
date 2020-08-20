@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/database.dart';
-import 'package:Intern/shared/CustomDialogs.dart';
 import 'package:Intern/shared/ItemTile.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
+import 'package:Intern/main.dart' as ref;
 
 class ItemList extends StatefulWidget {
   final List<Item> itemList;
@@ -18,7 +18,6 @@ class ItemList extends StatefulWidget {
 
 class _ItemList extends State<ItemList> {
   DatabaseService databaseService = DatabaseService();
-  ScrollController scrollController = ScrollController();
   final int maxItemFromScreen = 10;
 
   Future onDeleteItem(Item item) async {
@@ -53,52 +52,153 @@ class _ItemList extends State<ItemList> {
     }
   }
 
-  void getMoreData() async {
-    var newList =
-        await databaseService.items(limit: maxItemFromScreen, isFirst: false);
-    if (newList.length > 0) {
-      widget.itemList.addAll(newList);
-      setState(() {});
-    }
-  }
-
-  @override
-  void initState() {
-    scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        getMoreData();
-      }
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
+  void updateItemDialog({BuildContext context, Item item}) {
+    TextEditingController updateItemTitle = TextEditingController();
+    TextEditingController updateItemExplanation = TextEditingController();
+    String updateItemCategory;
+    TextEditingController updateItemLocation = TextEditingController();
+    TextEditingController updateItemPrice = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+              content: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: updateItemTitle,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Old Title: " + item.title),
+                      ),
+                      SizedBox(height: 20.0),
+                      TextField(
+                        controller: updateItemExplanation,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Old Explanation: " + item.explanation),
+                      ),
+                      SizedBox(height: 20.0),
+                      DropdownButtonFormField<String>(
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: "Electronics",
+                            child: Text(
+                              "Electronics",
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Sports",
+                            child: Text(
+                              "Sports",
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Cars",
+                            child: Text(
+                              "Cars",
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Gaming",
+                            child: Text(
+                              "Gaming",
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Movies, Books and Music",
+                            child: Text(
+                              "Movies, Books and Music",
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Housing",
+                            child: Text(
+                              "Housing",
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Other",
+                            child: Text(
+                              "Other",
+                            ),
+                          ),
+                        ],
+                        style: ref.textStyle.copyWith(color: Colors.grey),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        onChanged: (String value) {
+                          setState(() {
+                            updateItemCategory = value;
+                          });
+                        },
+                        hint: Text("Old category: " + item.category),
+                      ),
+                      SizedBox(height: 20.0),
+                      TextField(
+                        controller: updateItemLocation,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Old Location: " + item.location),
+                      ),
+                      SizedBox(height: 20.0),
+                      TextField(
+                        controller: updateItemPrice,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Old Price: " + item.price),
+                      ),
+                    ],
+                  )),
+              actions: <Widget>[
+                MaterialButton(
+                  onPressed: () {
+                    if (updateItemTitle.text.isEmpty &&
+                        updateItemExplanation.text.isEmpty &&
+                        (updateItemCategory?.isEmpty ?? true) &&
+                        updateItemLocation.text.isEmpty &&
+                        updateItemPrice.text.isEmpty) {
+                      Toast.show("Please fill at least one box", context,
+                          gravity: Toast.CENTER);
+                    } else {
+                      item.title = updateItemTitle.text;
+                      item.explanation = updateItemExplanation.text;
+                      item.category = updateItemCategory;
+                      item.location = updateItemLocation.text;
+                      item.price = updateItemPrice.text;
+                      updateItemTitle.clear();
+                      updateItemExplanation.clear();
+                      updateItemLocation.clear();
+                      updateItemPrice.clear();
+                      onUpdateItem(item);
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text("Update"),
+                ),
+              ],
+            ));
   }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      controller: scrollController,
       shrinkWrap: false,
       itemCount: widget.itemList.length,
       itemBuilder: (context, index) {
         return ItemTile(
-          context: context,
-          isAuthor: widget.user.uid == widget.itemList[index].author.uid,
-          item: widget.itemList[index],
-          delete: () => onDeleteItem(widget.itemList[index]),
-          update: () => CustomDialogs().updateItemDialog(
-              context: context,
-              item: widget.itemList[index],
-              onSubmitDialog: (newItem) {
-                onUpdateItem(newItem);
-                return null;
-              }),
-        );
+            context: context,
+            isAuthor: widget.user.uid == widget.itemList[index].author.uid,
+            item: widget.itemList[index],
+            delete: () => onDeleteItem(widget.itemList[index]),
+            update: () => updateItemDialog(
+                  context: context,
+                  item: widget.itemList[index],
+                ));
       },
     );
   }
