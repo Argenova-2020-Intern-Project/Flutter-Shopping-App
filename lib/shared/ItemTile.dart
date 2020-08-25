@@ -1,6 +1,5 @@
 import 'package:Intern/models/Item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class ItemTile extends StatelessWidget {
   final bool isAuthor;
@@ -19,21 +18,16 @@ class ItemTile extends StatelessWidget {
 
   String getDate(Duration dr) {
     if (dr.inDays >= 365) {
-      // 1 yıl önce
       return "${(dr.inDays / 365).round()} " + 'years ago';
     } else if (dr.inDays >= 7) {
-      // 1 hafta önce
       return "${(dr.inDays / 7).round()} " + 'weeks ago';
     } else if (dr.inDays >= 1) {
-      // 1 gün önce
       return "${dr.inDays} " + 'days ago';
     } else if (dr.inHours >= 1) {
-      // 1 saat önce
       return "${dr.inHours} " + 'hours ago';
     } else if (dr.inMinutes >= 1) {
       return "${dr.inMinutes} " + 'minutes ago';
     } else if (dr.inSeconds >= 1) {
-      // saniye önce
       return "${dr.inSeconds} " + 'seconds ago';
     } else {
       return 'now';
@@ -99,7 +93,6 @@ class ItemTile extends StatelessWidget {
                         ? PopupMenuButton(
                             elevation: 3.2,
                             icon: Icon(Icons.more_horiz),
-                            tooltip: 'more',
                             onSelected: onTapVert,
                             itemBuilder: (context) => <PopupMenuItem<int>>[
                               PopupMenuItem<int>(child: Text('Edit'), value: 0),
@@ -118,15 +111,17 @@ class ItemTile extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.all(36),
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('Title: ' + item.title, textAlign: TextAlign.left),
-                        Text('Explanation: ' + item.explanation, textAlign: TextAlign.left),
-                        Text('Category: ' + item.category, textAlign: TextAlign.left),
-                        Text('Location: ' + item.location, textAlign: TextAlign.left),
-                        Text('Price: ' + item.price, textAlign: TextAlign.left),
-                      ]),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(item.title, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 25)),
+                      Image.network(item.img_url, height: 250),
+                      Text(item.explanation, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                      Text('Category: ' + item.category, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                      Text('Location: ' + item.location, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                      Text(item.price + '₺', textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 20)),
+                    ]
+                  ),
                 ),
               ),
             ),

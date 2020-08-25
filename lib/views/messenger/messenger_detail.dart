@@ -7,7 +7,6 @@ import 'package:toast/toast.dart';
 import 'package:provider/provider.dart';
 
 class MessengerDetail extends StatefulWidget {
-  static const String route_id = "/messenger_detail";
   final User targetUser;
   final FirebaseUser currentUser;
 

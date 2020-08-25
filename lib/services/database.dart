@@ -24,6 +24,7 @@ class DatabaseService {
       'name': user.name,
       'email': user.email,
       'password': user.password,
+      'img_url': user.img_url
     });
   }
 
@@ -33,7 +34,8 @@ class DatabaseService {
         uid: dc.documentID,
         name: dc.data['name'],
         email: dc.data['email'],
-        password: dc.data['password']);
+        password: dc.data['password'],
+        img_url: dc.data['img_url']);
   }
 
   Future<List<User>> users({int limit, bool isFirst}) async {
@@ -55,7 +57,8 @@ class DatabaseService {
           uid: dc.documentID,
           name: dc.data['name'],
           email: dc.data['email'],
-          password: dc.data['password']));
+          password: dc.data['password'],
+          img_url: dc.data['img_url']));
       lastUserDc = dc;
     }
     return userList;
@@ -73,7 +76,8 @@ class DatabaseService {
           uid: dc.documentID,
           name: dc.data['name'],
           email: dc.data['email'],
-          password: dc.data['password']));
+          password: dc.data['password'],
+          img_url: dc.data['img_url']));
     }
     return userList;
   }
@@ -163,7 +167,8 @@ class DatabaseService {
           location: dc.data['location'],
           price: dc.data['price'],
           date: dc.data['date'],
-          views: dc.data['views']));
+          views: dc.data['views'],
+          img_url: dc.data['img_url']));
       lastItemDc = dc;
     }
     return itemList;
@@ -187,7 +192,8 @@ class DatabaseService {
           location: dc.data['location'],
           price: dc.data['price'],
           date: dc.data['date'],
-          views: dc.data['views']));
+          views: dc.data['views'],
+          img_url: dc.data['img_url']));
     }
     return itemList;
   }
@@ -201,7 +207,8 @@ class DatabaseService {
       'location': item.location,
       'price': item.price,
       'date': item.date,
-      'views': item.views
+      'views': item.views,
+      'img_url': item.img_url
     };
     await itemCollRef.add(map);
   }
@@ -219,13 +226,13 @@ class DatabaseService {
           'explanation': item.explanation,
         }, merge: true);
       }
-      
+
       if ((item.category?.isNotEmpty ?? true)) {
         await itemCollRef.document(item.item_uid).setData({
           'category': item.category,
         }, merge: true);
       }
-      
+
       if (item.location.isNotEmpty) {
         await itemCollRef.document(item.item_uid).setData({
           'location': item.location,

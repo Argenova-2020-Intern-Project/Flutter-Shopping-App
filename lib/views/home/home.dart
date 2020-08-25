@@ -7,8 +7,6 @@ import 'package:Intern/services/item-validator.dart';
 import 'package:Intern/views/home/item-list.dart';
 
 class HomePage extends StatefulWidget {
-  static const String route_id = "/home";
-
   @override
   State<StatefulWidget> createState() {
     return _HomePage();

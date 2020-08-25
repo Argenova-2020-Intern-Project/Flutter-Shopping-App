@@ -7,10 +7,12 @@ import 'package:Intern/services/database.dart';
 import 'package:Intern/services/item-validator.dart';
 import 'package:toast/toast.dart';
 import 'package:Intern/main.dart' as ref;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:path/path.dart' as Path;
 
 class SellStuff extends StatefulWidget {
-  static const String route_id = "/home";
-
   @override
   State<StatefulWidget> createState() {
     return _SellStuff();
@@ -30,12 +32,30 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
   final TextEditingController itemLocation = TextEditingController();
   final TextEditingController itemPrice = TextEditingController();
   final DatabaseService databaseService = DatabaseService();
+  File _image;
+  String _uploadedFileURL;
   List<Item> itemList = List();
   FirebaseUser user;
 
-  Future getItems() async {
-    user ??= await AuthService().getCurrentUser();
-    return databaseService.items(limit: 5, isFirst: true);
+  Future chooseFile() async {
+    await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
+      setState(() {
+        _image = image;
+      });
+    });
+  }
+
+  Future uploadFile() async {
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('item-photos/${Path.basename(_image.path)}}');
+    StorageUploadTask uploadTask = storageReference.putFile(_image);
+    await uploadTask.onComplete;
+    storageReference.getDownloadURL().then((fileURL) {
+      setState(() {
+        _uploadedFileURL = fileURL;
+      });
+    });
   }
 
   @override
@@ -78,7 +98,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blueAccent),
@@ -103,7 +123,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blueAccent),
@@ -168,7 +188,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blueAccent),
@@ -192,7 +212,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blueAccent),
@@ -215,7 +235,49 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
+                    _image != null
+                        ? Image.asset(_image.path, height: 200)
+                        : Text('Please upload an image for the preview!'),
+                    SizedBox(height: 10.0),
+                    _image == null
+                        ? Material(
+                            elevation: 5.0,
+                            borderRadius: BorderRadius.circular(30.0),
+                            color: ref.buttonColor,
+                            child: MaterialButton(
+                              minWidth: MediaQuery.of(context).size.width,
+                              padding:
+                                  EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                              onPressed: chooseFile,
+                              child: Text('Choose image for your item',
+                                  textAlign: TextAlign.center,
+                                  style: ref.buttonTextStyle),
+                            ),
+                          )
+                        : Container(),
+                    SizedBox(height: 10.0),
+                    _image != null
+                        ? Material(
+                            elevation: 5.0,
+                            borderRadius: BorderRadius.circular(30.0),
+                            color: ref.buttonColor,
+                            child: MaterialButton(
+                              minWidth: MediaQuery.of(context).size.width,
+                              padding:
+                                  EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                              onPressed: () {
+                                setState(() {
+                                  _image = null;
+                                });
+                              },
+                              child: Text('Clear that image',
+                                  textAlign: TextAlign.center,
+                                  style: ref.buttonTextStyle),
+                            ),
+                          )
+                        : Container(),
+                    SizedBox(height: 10.0),
                     Material(
                         elevation: 5.0,
                         borderRadius: BorderRadius.circular(30.0),
@@ -231,7 +293,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                               itemExplanation.text.isEmpty
                                   ? validateExplanation = true
                                   : validateExplanation = false;
-                              itemCategory.isEmpty
+                              (itemCategory?.isEmpty ?? true)
                                   ? validateCategory = true
                                   : validateCategory = false;
                               itemLocation.text.isEmpty
@@ -245,7 +307,8 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                                 itemExplanation.text.isNotEmpty &&
                                 (itemCategory?.isNotEmpty ?? true) &&
                                 itemLocation.text.isNotEmpty &&
-                                itemPrice.text.isNotEmpty) {
+                                itemPrice.text.isNotEmpty &&
+                                _image != null) {
                               String title = itemTitle.text;
                               String explanation = itemExplanation.text;
                               String category = itemCategory;
@@ -255,6 +318,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                               itemExplanation.clear();
                               itemLocation.clear();
                               itemPrice.clear();
+                              _image = null;
 
                               user ??= await AuthService().getCurrentUser();
                               Item item = Item(
@@ -264,9 +328,11 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                                   location: location,
                                   price: price,
                                   author_id: user.uid,
-                                  date: Timestamp.now());
+                                  date: Timestamp.now(),
+                                  img_url: _uploadedFileURL);
                               databaseService.insertItem(item).then((value) {
                                 setState(() {
+                                  uploadFile();
                                   itemList.add(item);
                                 });
                                 Toast.show(

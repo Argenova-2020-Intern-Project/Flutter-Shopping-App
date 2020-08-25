@@ -16,19 +16,18 @@ class UserList extends StatefulWidget {
 }
 
 class UserListState extends State<UserList> {
-  ScrollController scrollController = ScrollController();
   DatabaseService databaseService = DatabaseService();
   final int maxUserFromScreen = 10;
+  String currUserEmail;
 
   void navigateToDetail(User targetUser) async {
     FirebaseUser currentUser = await AuthService().getCurrentUser();
     Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            MessengerDetail(targetUser: targetUser, currentUser: currentUser),
-      )
-    );
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              MessengerDetail(targetUser: targetUser, currentUser: currentUser),
+        ));
   }
 
   void getMoreData() async {
@@ -40,33 +39,17 @@ class UserListState extends State<UserList> {
   }
 
   @override
-  void initState() {
-    scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        getMoreData();
-      }
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      controller: scrollController,
-      itemCount: widget.userList.length,
-      itemBuilder: (context, index) {
-        return Card(
-          child: ListTile(
+        itemCount: widget.userList.length,
+        itemBuilder: (context, index) {
+          return Card(
+              child: ListTile(
             onTap: () => navigateToDetail(widget.userList[index]),
             dense: true,
-            title: Text(
-                "${widget.userList[index].name}"
-            ),
+            title: Text("${widget.userList[index].name}"),
             subtitle: Text(widget.userList[index].email),
-          )
-        );
-      }
-    );
+          ));
+        });
   }
 }

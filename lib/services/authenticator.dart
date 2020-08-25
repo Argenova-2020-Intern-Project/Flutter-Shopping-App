@@ -29,14 +29,14 @@ class AuthService{
     return _singInStat;
   }
   
-  Future<AuthResultStatus> signUp({name, email, password}) async {
+  Future<AuthResultStatus> signUp({name, email, password, img_url}) async {
     try {
       AuthResult result = (await ref.auth
           .createUserWithEmailAndPassword(email: email, password: password));
       if (result.user != null) {
         _signUpStat = AuthResultStatus.successful;
         await DatabaseService().updateUser(
-          User(uid: result.user.uid, name: name, email: email, password: password));
+          User(uid: result.user.uid, name: name, email: email, password: password, img_url: img_url));
       } else {
         _signUpStat = AuthResultStatus.undefined;
       }

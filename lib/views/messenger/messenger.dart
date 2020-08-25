@@ -5,10 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:Intern/main.dart' as ref;
 
 class Messenger extends StatefulWidget {
-  static const String route_id = "/admin_messenger";
-
-  Messenger();
-
   @override
   State createState() => MessengerState();
 }
@@ -41,38 +37,32 @@ class MessengerState extends State<Messenger> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: TextFormField(
-            style: ref.appbarTextStyle,
-            controller: searchCtrl,
-            decoration: InputDecoration(
-              hintText: 'Search Chats',
-              prefixIcon: Icon(Icons.search, color: Colors.white),
-              suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
-                  color: Colors.white,
-                  onPressed: () => searchCtrl.clear()),
-            ),
-            onFieldSubmitted: onSubmitSearch,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: TextFormField(
+          style: ref.appbarTextStyle,
+          controller: searchCtrl,
+          decoration: InputDecoration(
+            hintText: 'Search Chats',
+            prefixIcon: Icon(Icons.search, color: Colors.white),
+            suffixIcon: IconButton(
+                icon: Icon(Icons.clear),
+                color: Colors.white,
+                onPressed: () => searchCtrl.clear()),
           ),
-          centerTitle: true,
+          onFieldSubmitted: onSubmitSearch,
         ),
-        body: RefreshIndicator(
-          key: refreshKey,
-          backgroundColor: ThemeData.dark().primaryColor,
-          onRefresh: () async {
-            setState(() {});
-          },
-          child: FutureBuilder(
-            future: future,
-            builder: (context, snapshot) {
-              userList = snapshot.data;
-              return (snapshot.connectionState == ConnectionState.waiting)
-                  ? Center(child: CircularProgressIndicator())
-                  : UserList(userList: userList);
-            },
-          ),
-        ));
+        centerTitle: true,
+      ),
+      body: FutureBuilder(
+        future: future,
+        builder: (context, snapshot) {
+          userList = snapshot.data;
+          return (snapshot.connectionState == ConnectionState.waiting)
+              ? Center(child: CircularProgressIndicator())
+              : UserList(userList: userList);
+        },
+      ),
+    );
   }
 }

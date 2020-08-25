@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:Intern/views/sell-stuff.dart';
-import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/views/user-profile.dart';
 import 'package:Intern/views/home/home.dart';
 import 'package:Intern/views/messenger/messenger.dart';
@@ -13,7 +12,6 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBar extends State<BottomNavBar> {
-  AuthService authService = new AuthService();
   int _currentIndex = 0;
 
   Widget tabs(int _tabIndex) {
