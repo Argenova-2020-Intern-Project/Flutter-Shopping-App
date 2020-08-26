@@ -1,6 +1,9 @@
 import 'package:Intern/views/sign-in.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:Intern/services/location-service.dart';
+import 'package:Intern/models/Location.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,14 +17,16 @@ final FirebaseAuth auth = FirebaseAuth.instance;
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Argenova Flutter Intern Project',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: SignInPage(),
-    );
+    return StreamProvider<UserLocation>(
+      create: (context) => LocationService().locationStream,
+      child:  MaterialApp(
+        title: 'Argenova Flutter Intern Project',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: SignInPage(),
+      ));
   }
 }
 

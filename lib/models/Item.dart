@@ -7,13 +7,13 @@ class Item {
   String title;
   String explanation;
   String category;
-  String location;
   String price;
   Timestamp date;
   DateTime time;
-  int views;
   User author;
   String img_url;
+  double latitude;
+  double longitude;
 
   Item(
       {this.item_uid,
@@ -21,11 +21,11 @@ class Item {
       this.title,
       this.explanation,
       this.category,
-      this.location,
       this.price,
       this.date,
-      this.views,
-      this.img_url});
+      this.img_url,
+      this.latitude,
+      this.longitude});
 
   Item.withAuthor(
       {this.item_uid,
@@ -33,10 +33,10 @@ class Item {
       this.title,
       this.explanation,
       this.category,
-      this.location,
       this.price,
       this.date,
-      this.views,
       this.author,
-      this.img_url});
+      this.img_url,
+      this.latitude,
+      this.longitude});
 }

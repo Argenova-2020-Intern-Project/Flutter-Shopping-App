@@ -5,6 +5,7 @@ import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/main.dart' as ref;
+import 'package:firebase_storage/firebase_storage.dart';
 
 class DatabaseService {
   final CollectionReference userCollRef =
@@ -164,11 +165,11 @@ class DatabaseService {
           title: dc.data['title'],
           explanation: dc.data['explanation'],
           category: dc.data['category'],
-          location: dc.data['location'],
           price: dc.data['price'],
           date: dc.data['date'],
-          views: dc.data['views'],
-          img_url: dc.data['img_url']));
+          img_url: dc.data['img_url'],
+          latitude: dc.data['latitude'],
+          longitude: dc.data['longitude']));
       lastItemDc = dc;
     }
     return itemList;
@@ -189,11 +190,11 @@ class DatabaseService {
           title: dc.data['title'],
           explanation: dc.data['explanation'],
           category: dc.data['category'],
-          location: dc.data['location'],
           price: dc.data['price'],
           date: dc.data['date'],
-          views: dc.data['views'],
-          img_url: dc.data['img_url']));
+          img_url: dc.data['img_url'],
+          latitude: dc.data['latitude'],
+          longitude: dc.data['longitude']));
     }
     return itemList;
   }
@@ -204,11 +205,11 @@ class DatabaseService {
       'title': item.title,
       'explanation': item.explanation,
       'category': item.category,
-      'location': item.location,
       'price': item.price,
       'date': item.date,
-      'views': item.views,
-      'img_url': item.img_url
+      'img_url': item.img_url,
+      'latitude': item.latitude,
+      'longitude': item.longitude
     };
     await itemCollRef.add(map);
   }
@@ -233,11 +234,6 @@ class DatabaseService {
         }, merge: true);
       }
 
-      if (item.location.isNotEmpty) {
-        await itemCollRef.document(item.item_uid).setData({
-          'location': item.location,
-        }, merge: true);
-      }
       if (item.price.isNotEmpty) {
         await itemCollRef.document(item.item_uid).setData({
           'price': item.price,
@@ -252,6 +248,11 @@ class DatabaseService {
     FirebaseUser firebaseUser = await authService.getCurrentUser();
     if (firebaseUser.uid == item.author.uid) {
       await itemCollRef.document(item.item_uid).delete();
+      StorageReference imgRef = await FirebaseStorage.instance
+          .ref()
+          .getStorage()
+          .getReferenceFromUrl(item.img_url);
+      await imgRef.delete();
       return 1;
     } else
       return null;

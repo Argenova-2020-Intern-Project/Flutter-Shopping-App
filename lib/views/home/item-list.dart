@@ -56,7 +56,6 @@ class _ItemList extends State<ItemList> {
     TextEditingController updateItemTitle = TextEditingController();
     TextEditingController updateItemExplanation = TextEditingController();
     String updateItemCategory;
-    TextEditingController updateItemLocation = TextEditingController();
     TextEditingController updateItemPrice = TextEditingController();
     showDialog(
         context: context,
@@ -139,12 +138,6 @@ class _ItemList extends State<ItemList> {
                         hint: Text("Old category: " + item.category),
                       ),
                       SizedBox(height: 20.0),
-                      TextField(
-                        controller: updateItemLocation,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Old Location: " + item.location),
-                      ),
                       SizedBox(height: 20.0),
                       TextField(
                         controller: updateItemPrice,
@@ -160,7 +153,6 @@ class _ItemList extends State<ItemList> {
                     if (updateItemTitle.text.isEmpty &&
                         updateItemExplanation.text.isEmpty &&
                         (updateItemCategory?.isEmpty ?? true) &&
-                        updateItemLocation.text.isEmpty &&
                         updateItemPrice.text.isEmpty) {
                       Toast.show("Please fill at least one box", context,
                           gravity: Toast.CENTER);
@@ -168,11 +160,9 @@ class _ItemList extends State<ItemList> {
                       item.title = updateItemTitle.text;
                       item.explanation = updateItemExplanation.text;
                       item.category = updateItemCategory;
-                      item.location = updateItemLocation.text;
                       item.price = updateItemPrice.text;
                       updateItemTitle.clear();
                       updateItemExplanation.clear();
-                      updateItemLocation.clear();
                       updateItemPrice.clear();
                       onUpdateItem(item);
                       Navigator.pop(context);

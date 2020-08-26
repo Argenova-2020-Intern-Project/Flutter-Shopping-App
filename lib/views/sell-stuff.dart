@@ -11,6 +11,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:path/path.dart' as Path;
+import 'package:provider/provider.dart';
+import 'package:Intern/models/Location.dart';
 
 class SellStuff extends StatefulWidget {
   @override
@@ -21,21 +23,24 @@ class SellStuff extends StatefulWidget {
 
 class _SellStuff extends State<SellStuff> with ItemValidationMixin {
   final formKey = GlobalKey<FormState>();
+  File _image;
+  List<Item> itemList = List();
+  FirebaseUser user;
   bool validateTitle = false;
   bool validateExplanation = false;
   bool validateCategory = false;
-  bool validateLocation = false;
   bool validatePrice = false;
+  bool validateLatitude = false;
+  bool validateLongitude = false;
+  bool currLocation = false;
+  bool isLoading = false;
   final TextEditingController itemTitle = TextEditingController();
   final TextEditingController itemExplanation = TextEditingController();
   String itemCategory;
-  final TextEditingController itemLocation = TextEditingController();
   final TextEditingController itemPrice = TextEditingController();
   final DatabaseService databaseService = DatabaseService();
-  File _image;
-  String _uploadedFileURL;
-  List<Item> itemList = List();
-  FirebaseUser user;
+  TextEditingController latitude = TextEditingController();
+  TextEditingController longitude = TextEditingController();
 
   Future chooseFile() async {
     await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
@@ -45,21 +50,40 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
     });
   }
 
-  Future uploadFile() async {
+  Future postItem(String title, String explanation, String category,
+      String price, double latitude, double longitude) async {
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('item-photos/${Path.basename(_image.path)}}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
+    user ??= await AuthService().getCurrentUser();
     storageReference.getDownloadURL().then((fileURL) {
-      setState(() {
-        _uploadedFileURL = fileURL;
+      Item item = Item(
+          title: title,
+          explanation: explanation,
+          category: category,
+          price: price,
+          author_id: user.uid,
+          date: Timestamp.now(),
+          img_url: fileURL,
+          latitude: latitude,
+          longitude: longitude);
+      databaseService.insertItem(item).then((value) {
+        setState(() {
+          itemList.add(item);
+        });
+        Toast.show(
+            'Your item posted successfully!', context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM);
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var userLocation = Provider.of<UserLocation>(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -190,28 +214,69 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                     ),
                     SizedBox(height: 10.0),
                     DecoratedBox(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blueAccent),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                        child: TextField(
-                          controller: itemLocation,
-                          style: ref.textStyle,
-                          minLines: 1,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            labelText: "Enter the location of your item",
-                            errorText: validateLocation
-                                ? 'Location can\'t be empty!'
-                                : null,
-                          ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blueAccent),
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
-                      ),
-                    ),
+                        child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10),
+                            child: Row(children: [
+                              Expanded(
+                                  child: currLocation
+                                      ? Text(
+                                          '${userLocation.latitude}',
+                                          style: ref.textStyle,
+                                        )
+                                      : TextField(
+                                          controller: latitude,
+                                          style: ref.textStyle
+                                              .copyWith(fontSize: 10),
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            labelText: 'Enter latitude',
+                                            errorText: validateLatitude
+                                                ? 'latitude can\'t be empty!'
+                                                : null,
+                                          ),
+                                        )),
+                              Expanded(
+                                  child: currLocation
+                                      ? Text(
+                                          '${userLocation.longitude}',
+                                          style: ref.textStyle,
+                                        )
+                                      : TextField(
+                                          controller: longitude,
+                                          style: ref.textStyle
+                                              .copyWith(fontSize: 10),
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            labelText: 'Enter longitude',
+                                            errorText: validateLongitude
+                                                ? 'longitude can\'t be empty!'
+                                                : null,
+                                          ),
+                                        )),
+                              Container(
+                                  margin: EdgeInsets.fromLTRB(30, 5, 0, 5),
+                                  decoration: BoxDecoration(
+                                    color: ref.buttonColor,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)),
+                                  ),
+                                  child: FlatButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        currLocation = true;
+                                        validateLongitude = true;
+                                        validateLatitude = true;
+                                      });
+                                    },
+                                    child: Text('Current Location',
+                                        style: ref.textStyle),
+                                  ))
+                            ]))),
                     SizedBox(height: 10.0),
                     DecoratedBox(
                       decoration: BoxDecoration(
@@ -237,7 +302,7 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                     ),
                     SizedBox(height: 10.0),
                     _image != null
-                        ? Image.asset(_image.path, height: 200)
+                        ? Image.file(_image, height: 200)
                         : Text('Please upload an image for the preview!'),
                     SizedBox(height: 10.0),
                     _image == null
@@ -296,9 +361,6 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                               (itemCategory?.isEmpty ?? true)
                                   ? validateCategory = true
                                   : validateCategory = false;
-                              itemLocation.text.isEmpty
-                                  ? validateLocation = true
-                                  : validateLocation = false;
                               itemPrice.text.isEmpty
                                   ? validatePrice = true
                                   : validatePrice = false;
@@ -306,40 +368,26 @@ class _SellStuff extends State<SellStuff> with ItemValidationMixin {
                             if (itemTitle.text.isNotEmpty &&
                                 itemExplanation.text.isNotEmpty &&
                                 (itemCategory?.isNotEmpty ?? true) &&
-                                itemLocation.text.isNotEmpty &&
                                 itemPrice.text.isNotEmpty &&
                                 _image != null) {
-                              String title = itemTitle.text;
-                              String explanation = itemExplanation.text;
-                              String category = itemCategory;
-                              String location = itemLocation.text;
-                              String price = itemPrice.text;
+                              double _latitude = currLocation
+                                  ? double.parse('${userLocation.latitude}')
+                                  : double.parse(latitude.text.toString());
+                              double _longitude = currLocation
+                                  ? double.parse('${userLocation.longitude}')
+                                  : double.parse(longitude.text.toString());
+                              postItem(
+                                  itemTitle.text.toString(),
+                                  itemExplanation.text,
+                                  itemCategory,
+                                  itemPrice.text,
+                                  _latitude,
+                                  _longitude);
                               itemTitle.clear();
                               itemExplanation.clear();
-                              itemLocation.clear();
                               itemPrice.clear();
-                              _image = null;
-
-                              user ??= await AuthService().getCurrentUser();
-                              Item item = Item(
-                                  title: title,
-                                  explanation: explanation,
-                                  category: category,
-                                  location: location,
-                                  price: price,
-                                  author_id: user.uid,
-                                  date: Timestamp.now(),
-                                  img_url: _uploadedFileURL);
-                              databaseService.insertItem(item).then((value) {
-                                setState(() {
-                                  uploadFile();
-                                  itemList.add(item);
-                                });
-                                Toast.show(
-                                    'Your item posted successfully!', context,
-                                    duration: Toast.LENGTH_LONG,
-                                    gravity: Toast.BOTTOM);
-                              });
+                              latitude.clear();
+                              longitude.clear();
                             }
                           },
                           child: Text("Post your item",

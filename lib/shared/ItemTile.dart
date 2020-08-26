@@ -118,7 +118,7 @@ class ItemTile extends StatelessWidget {
                       Image.network(item.img_url, height: 250),
                       Text(item.explanation, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
                       Text('Category: ' + item.category, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
-                      Text('Location: ' + item.location, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                      Text('Location: ' + item.latitude.toString() + ', ' + item.longitude.toString(), textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
                       Text(item.price + '₺', textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 20)),
                     ]
                   ),
