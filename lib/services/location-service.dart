@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:location/location.dart';
 import 'package:Intern/models/Location.dart';
 

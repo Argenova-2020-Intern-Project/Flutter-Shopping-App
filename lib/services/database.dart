@@ -4,8 +4,8 @@ import 'package:Intern/models/User.dart';
 import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:Intern/main.dart' as ref;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:Intern/main.dart' as ref;
 
 class DatabaseService {
   final CollectionReference userCollRef =
@@ -217,28 +217,42 @@ class DatabaseService {
   Future updateItem(Item item) async {
     FirebaseUser firebaseUser = await authService.getCurrentUser();
     if (firebaseUser.uid == item.author.uid) {
-      if (item.title.isNotEmpty) {
+      if (item.title != null) {
         await itemCollRef.document(item.item_uid).setData({
           'title': item.title,
         }, merge: true);
       }
-      if (item.explanation.isNotEmpty) {
+
+      if (item.explanation != null) {
         await itemCollRef.document(item.item_uid).setData({
           'explanation': item.explanation,
         }, merge: true);
       }
 
-      if ((item.category?.isNotEmpty ?? true)) {
+      if (item.category != null) {
         await itemCollRef.document(item.item_uid).setData({
           'category': item.category,
         }, merge: true);
       }
 
-      if (item.price.isNotEmpty) {
+      if (item.price != null) {
         await itemCollRef.document(item.item_uid).setData({
           'price': item.price,
         }, merge: true);
       }
+
+      if (item.latitude != null) {
+        await itemCollRef.document(item.item_uid).setData({
+          'latitude': item.latitude,
+        }, merge: true);
+      }
+
+      if (item.longitude != null) {
+        await itemCollRef.document(item.item_uid).setData({
+          'longitude': item.longitude,
+        }, merge: true);
+      }
+
       return 1;
     } else
       return null;

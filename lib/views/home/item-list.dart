@@ -4,7 +4,7 @@ import 'package:Intern/services/database.dart';
 import 'package:Intern/shared/ItemTile.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
-import 'package:Intern/main.dart' as ref;
+import 'package:Intern/views/bottom-nav-bar.dart';
 
 class ItemList extends StatefulWidget {
   final List<Item> itemList;
@@ -44,25 +44,26 @@ class _ItemList extends State<ItemList> {
           duration: Toast.LENGTH_LONG,
           backgroundColor: ThemeData.dark().dialogBackgroundColor);
     } else {
-      setState(() {
-        Toast.show('Your item successfully updated', context,
-            duration: Toast.LENGTH_LONG,
-            backgroundColor: ThemeData.dark().dialogBackgroundColor);
-      });
+      Toast.show('Your item successfully updated', context,
+          duration: Toast.LENGTH_LONG,
+          backgroundColor: ThemeData.dark().dialogBackgroundColor);
     }
   }
 
   void updateItemDialog({BuildContext context, Item item}) {
     TextEditingController updateItemTitle = TextEditingController();
     TextEditingController updateItemExplanation = TextEditingController();
-    String updateItemCategory;
+    TextEditingController updateItemCategory = TextEditingController();
     TextEditingController updateItemPrice = TextEditingController();
+    TextEditingController updateItemLatitude = TextEditingController();
+    TextEditingController updateItemLongitude = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
-              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+                  borderRadius: BorderRadius.all(Radius.circular(15))),
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 15),
               content: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
@@ -73,14 +74,14 @@ class _ItemList extends State<ItemList> {
                             border: InputBorder.none,
                             hintText: "Old Title: " + item.title),
                       ),
-                      SizedBox(height: 20.0),
+                      SizedBox(height: 10.0),
                       TextField(
                         controller: updateItemExplanation,
                         decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Old Explanation: " + item.explanation),
                       ),
-                      SizedBox(height: 20.0),
+                      SizedBox(height: 10.0),
                       DropdownButtonFormField<String>(
                         items: [
                           DropdownMenuItem<String>(
@@ -126,19 +127,33 @@ class _ItemList extends State<ItemList> {
                             ),
                           ),
                         ],
-                        style: ref.textStyle.copyWith(color: Colors.grey),
                         decoration: InputDecoration(
                           border: InputBorder.none,
                         ),
                         onChanged: (String value) {
                           setState(() {
-                            updateItemCategory = value;
+                            updateItemCategory.text = value;
                           });
                         },
                         hint: Text("Old category: " + item.category),
                       ),
-                      SizedBox(height: 20.0),
-                      SizedBox(height: 20.0),
+                      SizedBox(height: 10.0),
+                      TextField(
+                        controller: updateItemLatitude,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Old latitude: ${item.latitude}',
+                        ),
+                      ),
+                      SizedBox(height: 10.0),
+                      TextField(
+                        controller: updateItemLongitude,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Old longitude: ${item.longitude}',
+                        ),
+                      ),
+                      SizedBox(height: 10.0),
                       TextField(
                         controller: updateItemPrice,
                         decoration: InputDecoration(
@@ -149,23 +164,44 @@ class _ItemList extends State<ItemList> {
                   )),
               actions: <Widget>[
                 MaterialButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (updateItemTitle.text.isEmpty &&
                         updateItemExplanation.text.isEmpty &&
-                        (updateItemCategory?.isEmpty ?? true) &&
-                        updateItemPrice.text.isEmpty) {
+                        updateItemCategory.text.isEmpty &&
+                        updateItemPrice.text.isEmpty &&
+                        updateItemLatitude.text.isEmpty &&
+                        updateItemLongitude.text.isEmpty) {
                       Toast.show("Please fill at least one box", context,
-                          gravity: Toast.CENTER);
+                          gravity: Toast.BOTTOM);
                     } else {
-                      item.title = updateItemTitle.text;
-                      item.explanation = updateItemExplanation.text;
-                      item.category = updateItemCategory;
-                      item.price = updateItemPrice.text;
+                      item.title = updateItemTitle.text.isNotEmpty
+                          ? updateItemTitle.text
+                          : null;
+                      item.explanation = updateItemExplanation.text.isNotEmpty
+                          ? updateItemExplanation.text
+                          : null;
+                      item.category = updateItemCategory.text.isNotEmpty
+                          ? updateItemCategory.text
+                          : null;
+                      item.price = updateItemPrice.text.isNotEmpty
+                          ? updateItemPrice.text
+                          : null;
+                      item.latitude = updateItemLatitude.text.isNotEmpty
+                          ? double.parse(updateItemLatitude.text.toString())
+                          : null;
+                      item.longitude = updateItemLongitude.text.isNotEmpty
+                          ? double.parse(updateItemLongitude.text.toString())
+                          : null;
                       updateItemTitle.clear();
                       updateItemExplanation.clear();
                       updateItemPrice.clear();
-                      onUpdateItem(item);
-                      Navigator.pop(context);
+                      updateItemLatitude.clear();
+                      updateItemLongitude.clear();
+                      await onUpdateItem(item);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BottomNavBar()),
+                      );
                     }
                   },
                   child: Text("Update"),

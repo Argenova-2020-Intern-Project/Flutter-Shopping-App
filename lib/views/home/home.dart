@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/services/database.dart';
-import 'package:Intern/services/item-validator.dart';
 import 'package:Intern/views/home/item-list.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,7 +12,7 @@ class HomePage extends StatefulWidget {
   }
 }
 
-class _HomePage extends State<HomePage> with ItemValidationMixin {
+class _HomePage extends State<HomePage> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController itemCtrl = TextEditingController();
   final DatabaseService databaseService = DatabaseService();

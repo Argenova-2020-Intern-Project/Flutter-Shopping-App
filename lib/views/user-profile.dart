@@ -55,8 +55,8 @@ class _UserProfile extends State<UserProfile> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    CircleAvatar(
-                        radius: 80, backgroundImage: profilePhoto),
+                    profilePhoto != null ? CircleAvatar(
+                        radius: 80, backgroundImage: profilePhoto, backgroundColor: Colors.white,) : CircularProgressIndicator(),
                     SizedBox(height: 20.0),
                     Material(
                       elevation: 5.0,

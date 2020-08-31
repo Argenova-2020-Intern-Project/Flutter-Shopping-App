@@ -101,10 +101,12 @@ class _SignUpPage extends State<SignUpPage> {
               ),
             )
           : Center(
-              child: Form(
-                key: formKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(36.0),
+            child: Form(
+              key: formKey,
+              child: Padding(
+                padding: EdgeInsets.all(36.0),
+                child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -228,8 +230,9 @@ class _SignUpPage extends State<SignUpPage> {
                     ],
                   ),
                 ),
-              ),
+              )
             ),
+          ),
     );
   }
 }

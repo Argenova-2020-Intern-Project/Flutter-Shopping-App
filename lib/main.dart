@@ -1,18 +1,17 @@
 import 'package:Intern/views/sign-in.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:Intern/services/location-service.dart';
 import 'package:Intern/models/Location.dart';
-
-void main() => runApp(MyApp());
+import 'package:firebase_auth/firebase_auth.dart';
 
 final TextStyle textStyle = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
-final TextStyle appbarTextStyle = textStyle.copyWith(fontSize: 25);
-final TextStyle buttonTextStyle =
-    textStyle.copyWith(color: Colors.white, fontWeight: FontWeight.bold);
+final TextStyle appbarTextStyle = TextStyle(fontFamily: 'Montserrat', fontSize: 25.0);
+final TextStyle buttonTextStyle = TextStyle(fontFamily: 'Montserrat', fontSize: 25.0, color: Colors.white, fontWeight: FontWeight.bold);
 final buttonColor = Color(0xff01A0C7);
 final FirebaseAuth auth = FirebaseAuth.instance;
+
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override

@@ -1,13 +1,12 @@
 import 'package:Intern/models/Item.dart';
 import 'package:flutter/material.dart';
-
+import 'package:Intern/main.dart' as ref;
 class ItemTile extends StatelessWidget {
   final bool isAuthor;
   final Item item;
   final Function delete;
   final Function update;
   final BuildContext context;
-  String dateTxt;
 
   ItemTile(
       {@required this.context,
@@ -52,13 +51,12 @@ class ItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     DateTime dt = item.date.toDate();
     Duration dr = DateTime.now().difference(dt);
-    dateTxt = getDate(dr);
     return Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         elevation: 10,
-        margin: EdgeInsets.symmetric(vertical: 5),
+        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         child: Column(
           children: [
             DecoratedBox(
@@ -77,9 +75,10 @@ class ItemTile extends StatelessWidget {
                         child: Text.rich(
                           TextSpan(
                             text: "${item.author.name}\n• ",
+                            style: ref.textStyle.copyWith(fontWeight: FontWeight.bold),
                             children: [
                               TextSpan(
-                                  text: dateTxt,
+                                  text: getDate(dr),
                                   style: TextStyle(
                                       fontSize: 11, color: Colors.black
                                   )
@@ -105,25 +104,21 @@ class ItemTile extends StatelessWidget {
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                child: Padding(
-                  padding: EdgeInsets.all(36),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(item.title, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 25)),
-                      Image.network(item.img_url, height: 250),
-                      Text(item.explanation, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
-                      Text('Category: ' + item.category, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
-                      Text('Location: ' + item.latitude.toString() + ', ' + item.longitude.toString(), textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
-                      Text(item.price + '₺', textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 20)),
-                    ]
-                  ),
+            Container(
+              alignment: Alignment.topLeft,
+              padding: EdgeInsets.fromLTRB(25, 15, 0, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(item.title, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 25)),
+                    Image.network(item.img_url, height: 250),
+                    Text(item.explanation, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                    Text('Category: ' + item.category, textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                    Text('Location: ' + item.latitude.toString() + ', ' + item.longitude.toString(), textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 15)),
+                    Text(item.price + '₺', textAlign: TextAlign.left, style: TextStyle(fontFamily: 'Montserrat', fontSize: 20)),
+                  ]
                 ),
-              ),
             ),
           ],
         ));

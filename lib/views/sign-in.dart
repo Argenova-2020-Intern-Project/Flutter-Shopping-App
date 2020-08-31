@@ -29,9 +29,9 @@ class _SignInPage extends State<SignInPage> {
   signIn() async {
     if (formKey.currentState.validate()) {
       isLoading = true;
-      final hashedPassword = Password.hash(_password.text, algorithm);
+      final hashedPassword = Password.hash(_password.text.trim(), algorithm);
       final _status =
-          await authService.signIn(email: _email.text, pass: hashedPassword);
+          await authService.signIn(email: _email.text.trim(), pass: hashedPassword);
       if (_status == AuthResultStatus.successful) {
         Navigator.push(
           context,
