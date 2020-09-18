@@ -111,18 +111,19 @@ class _SignUpPage extends State<SignUpPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                          backgroundImage:
-                              _image != null ? AssetImage(_image.path) : null,
-                          radius: 80.0,
-                          child: RawMaterialButton(
+                      RawMaterialButton(
                             onPressed: chooseFile,
                             child: _image == null
                                 ? Icon(Icons.photo_camera, size: 50)
-                                : null,
+                                : CircleAvatar(
+                          backgroundImage:
+                              AssetImage(_image.path),
+                              backgroundColor: Colors.blue,
+                          radius: 80.0,
+                          ),
                             padding: EdgeInsets.all(15.0),
                             shape: CircleBorder(),
-                          )),
+                          ),
                       SizedBox(height: 25.0),
                       TextField(
                         controller: _name,

@@ -93,7 +93,7 @@ class _SellStuff extends State<SellStuff> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Sell Stuff'),
+        title: Text('Sell Stuff', style: ref.appbarTextStyle),
       ),
       body: isLoading
           ? Container(

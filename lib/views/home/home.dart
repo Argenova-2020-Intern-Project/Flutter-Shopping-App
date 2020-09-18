@@ -4,6 +4,7 @@ import 'package:Intern/models/Item.dart';
 import 'package:Intern/services/authenticator.dart';
 import 'package:Intern/services/database.dart';
 import 'package:Intern/views/home/item-list.dart';
+import 'package:Intern/main.dart' as ref;
 
 class HomePage extends StatefulWidget {
   @override
@@ -44,7 +45,7 @@ class _HomePage extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Dashboard'),
+        title: Text('Dashboard', style: ref.appbarTextStyle),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20),

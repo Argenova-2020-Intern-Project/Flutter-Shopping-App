@@ -44,6 +44,7 @@ class MessengerState extends State<Messenger> {
           controller: searchCtrl,
           decoration: InputDecoration(
             hintText: 'Search Chats',
+            border: InputBorder.none,
             prefixIcon: Icon(Icons.search, color: Colors.white),
             suffixIcon: IconButton(
                 icon: Icon(Icons.clear),

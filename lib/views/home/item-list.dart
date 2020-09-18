@@ -63,7 +63,7 @@ class _ItemList extends State<ItemList> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(15))),
               contentPadding:
-                  EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               content: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
